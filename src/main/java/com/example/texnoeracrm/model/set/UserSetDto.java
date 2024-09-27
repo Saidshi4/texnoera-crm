@@ -20,10 +20,6 @@ public class UserSetDto {
     private LocalDate birthdate;
     private String phoneNumber;
     private String email;
-    private Long diplomaNo;
-    private Double averageScore;
-    private String username;
-    private String password;
     @Schema(description = "ADMIN, STUDENT, TEACHER, MENTOR")
     private RoleEnum role;
 }

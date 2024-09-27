@@ -6,14 +6,10 @@ import com.example.texnoeracrm.enums.ExceptionEnum;
 import com.example.texnoeracrm.exception.NotFoundException;
 import com.example.texnoeracrm.mapper.UserMapper;
 import com.example.texnoeracrm.model.get.UserGetDto;
-import com.example.texnoeracrm.model.set.UserSetDto;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -34,13 +30,6 @@ public class UserService {
         return userEntity;
     }
 
-    public void createUser(UserSetDto userSetDto) {
-        log.info("ActionLog.createUser.start");
-        UserEntity userEntity = userMapper.mapToEntity(userSetDto);
-        userEntity.setCreated_at(LocalDateTime.now());
-        userRepository.save(userEntity);
-        log.info("ActionLog.createUser.end");
-    }
 
     public UserGetDto getUser(Long userId) {
         log.info("ActionLog.getUser.start userId {}", userId);
@@ -56,6 +45,14 @@ public class UserService {
         List<UserGetDto> userGetDtos = userMapper.mapToDtos(userEntities);
         log.info("ActionLog.getAllUser.end");
         return userGetDtos;
+    }
+
+    public void deleteUser(Long userId) {
+        log.info("ActionLog.deleteUser.start");
+        UserEntity userEntity = findById(userId);
+        userEntity.setIsActive(false);
+        userRepository.deleteById(userId);
+        log.info("ActionLog.deleteUser.end userId {}", userId);
     }
 
 }

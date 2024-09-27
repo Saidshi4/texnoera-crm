@@ -23,5 +23,6 @@ public class UserGetDto {
     private String username;
     private String password;
     private RoleEnum role;
+    private Boolean isActive;
     private LocalDateTime created_at;
 }

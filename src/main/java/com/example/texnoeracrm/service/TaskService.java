@@ -35,7 +35,7 @@ public class TaskService {
     public void createTask(TaskSetDto taskSetDto) {
         log.info("ActionLog.createTask.start");
         TaskEntity taskEntity = taskMapper.mapToEntity(taskSetDto);
-        taskEntity.setCreated_at(LocalDateTime.now());
+        taskEntity.setCreatedAt(LocalDateTime.now());
         taskRepository.save(taskEntity);
         log.info("ActionLog.createTask.end");
     }

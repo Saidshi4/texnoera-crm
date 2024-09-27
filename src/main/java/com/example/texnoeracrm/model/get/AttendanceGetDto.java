@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class AttendanceGetDto {
     private Long id;
-    private UserGetDto userGetDto;
-    private GroupGetDto groupGetDto;
+    private UserAttendanceGetDto userAttendanceGetDto;
+    private GroupAttendanceGetDto groupAttendanceGetDto;
     private AttendanceEnum status;
     private LocalDateTime dateTime;
 }

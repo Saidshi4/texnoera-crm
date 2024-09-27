@@ -12,14 +12,14 @@ import java.util.List;
 public interface AttendanceMapper {
 
     @Mapping(source = "userAssignDto", target = "userEntity")
-    @Mapping(source = "groupAssignDto", target = "groupEntity")
     AttendanceEntity mapToEntity(AttendanceSetDto attendanceSetDto);
 
-    @Mapping(target = "userGetDto", source = "userEntity")
-    @Mapping(target = "groupGetDto", source = "groupEntity")
+    List<AttendanceEntity> mapToEntities(List<AttendanceSetDto> attendanceSetDtos);
+
+    @Mapping(target = "userAttendanceGetDto", source = "userEntity")
+    @Mapping(target = "groupAttendanceGetDto", source = "groupEntity")
     AttendanceGetDto mapToDto(AttendanceEntity attendanceEntity);
 
-    @Mapping(target = "userAssignDto", source = "userEntity")
-    @Mapping(target = "groupAssignDto", source = "groupEntity")
     List<AttendanceGetDto> mapToDtos(List<AttendanceEntity> attendanceEntities);
+
 }

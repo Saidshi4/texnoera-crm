@@ -4,13 +4,10 @@ import com.example.texnoeracrm.model.get.AttendanceGetDto;
 import com.example.texnoeracrm.model.set.AttendanceSetDto;
 import com.example.texnoeracrm.service.AttendanceService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -20,9 +17,9 @@ public class AttendanceController {
 
     private final AttendanceService attendanceService;
 
-    @PostMapping
-    public void creatAttendance(@RequestBody AttendanceSetDto attendanceSetDto){
-        attendanceService.createAttendance(attendanceSetDto);
+    @PostMapping("/groups/{groupId}")
+    public void creatAttendances(@PathVariable Long groupId, @RequestBody List<AttendanceSetDto> attendanceSetDtoList){
+        attendanceService.createAttendances(groupId, attendanceSetDtoList);
     }
 
     @GetMapping("/{attendanceId}")
@@ -34,5 +31,16 @@ public class AttendanceController {
     public List<AttendanceGetDto> getAllAttendances(){
         return attendanceService.getAllAttendances();
     }
+
+    @GetMapping("/groups/{groupId}")
+    public List<AttendanceGetDto> getAttendancesByGroupAndDateRange(
+            @PathVariable Long groupId,
+            @RequestParam("fromDate") @DateTimeFormat(pattern = "yyyy-M-d") LocalDate fromDate,
+            @RequestParam("toDate") @DateTimeFormat(pattern = "yyyy-M-d") LocalDate toDate) {
+
+        return attendanceService.getAttendancesByGroupAndDateRange(groupId, fromDate, toDate);
+    }
+
+
 
 }

@@ -32,5 +32,5 @@ public class AttendanceEntity {
     private GroupEntity groupEntity;
     @Enumerated(EnumType.STRING)
     private AttendanceEnum status;
-    private LocalDateTime dateTime;
+    private LocalDateTime createdAt;
 }

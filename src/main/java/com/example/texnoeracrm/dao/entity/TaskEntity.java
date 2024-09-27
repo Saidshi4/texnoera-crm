@@ -29,7 +29,7 @@ public class TaskEntity {
     private String name;
     private String description;
     private TaskStatusEnum status;
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
 
     @ManyToMany(mappedBy = "taskEntities", cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     private List<UserEntity> userEntities;

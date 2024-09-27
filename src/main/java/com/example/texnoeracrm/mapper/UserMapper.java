@@ -7,6 +7,7 @@ import com.example.texnoeracrm.model.set.UserSetDto;
 import org.mapstruct.Mapper;
 
 import java.util.List;
+import java.util.Optional;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
@@ -20,4 +21,5 @@ public interface UserMapper {
     List<UserEntity> mapToEntities(List<UserGetDto> userGetDtos);
     List<UserEntity> mapAssignDtoToEntities(List<UserAssignDto> userAssignDtos);
     UserEntity mapToEntityFromAssignDto(UserAssignDto userAssignDto);
+
 }

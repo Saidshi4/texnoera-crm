@@ -8,10 +8,9 @@ import com.example.texnoeracrm.enums.ExceptionEnum;
 import com.example.texnoeracrm.exception.NotFoundException;
 import com.example.texnoeracrm.mapper.GroupMapper;
 import com.example.texnoeracrm.model.get.GroupGetDto;
+import com.example.texnoeracrm.model.set.GroupScheduleSetDto;
 import com.example.texnoeracrm.model.set.GroupSetDto;
 import com.example.texnoeracrm.model.set.UserAssignDto;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,9 +27,7 @@ public class GroupService {
     private final GroupRepository groupRepository;
     private final GroupMapper groupMapper;
     private final UserRepository userRepository;
-    private final UserService userService;
-
-    public GroupEntity findById(Long groupId) {
+    private GroupEntity findById(Long groupId) {
         log.info("ActionLog.groupFindById.start groupId {}", groupId);
         GroupEntity groupEntity = groupRepository.findById(groupId)
                 .orElseThrow(() -> new NotFoundException(
@@ -41,10 +38,22 @@ public class GroupService {
         return groupEntity;
     }
 
+    private UserEntity findUserById(Long userId) {
+        log.info("ActionLog.userFindById.start userId {}", userId);
+        UserEntity userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(
+                        ExceptionEnum.USER_NOT_FOUND.name(),
+                        String.format(ExceptionEnum.USER_NOT_FOUND.getLog(), userId)
+                ));
+        log.info("ActionLog.userFindById.end userId {}", userId);
+        return userEntity;
+    }
+
+
     public void createGroup(GroupSetDto groupSetDto) {
         log.info("ActionLog.createGroup.start");
         GroupEntity groupEntity = groupMapper.mapToEntity(groupSetDto);
-        groupEntity.setCreated_at(LocalDateTime.now());
+        groupEntity.setCreatedAt(LocalDateTime.now());
         groupRepository.save(groupEntity);
         log.info("ActionLog.createGroup.end");
     }
@@ -69,7 +78,7 @@ public class GroupService {
         log.info("ActionLog.addUsersToGroup.start");
         GroupEntity groupEntity = findById(groupId);
         for (UserAssignDto userAssignDto : userAssignDtos) {
-            UserEntity userEntity = userService.findById(userAssignDto.getId());
+            UserEntity userEntity = findUserById(userAssignDto.getId());
             if (userEntity.getGroupEntities() == null) {
                 userEntity.setGroupEntities(new ArrayList<>());
             }
@@ -98,7 +107,7 @@ public class GroupService {
         log.info("ActionLog.deleteUsersToGroup.start");
         GroupEntity groupEntity = findById(groupId);
         for (UserAssignDto userAssignDto : userAssignDtos) {
-            UserEntity userEntity = userService.findById(userAssignDto.getId());
+            UserEntity userEntity = findUserById(userAssignDto.getId());
             if (userEntity.getGroupEntities().contains(groupEntity)) {
                 userEntity.getGroupEntities().remove(groupEntity);
                 userRepository.save(userEntity);
@@ -111,5 +120,21 @@ public class GroupService {
         log.info("ActionLog.deleteUsersToGroup.end");
     }
 
+    public void setGroupSchedule(Long groupId, GroupScheduleSetDto groupScheduleSetDto) {
+        log.info("ActionLog.setGroupSchedule.start");
+        GroupEntity groupEntity = findById(groupId);
+        groupEntity.setDaysOfWeek(groupScheduleSetDto.getDaysOfWeek());
+        groupEntity.setLessonTimes(groupScheduleSetDto.getLessonTime());
+        groupRepository.save(groupEntity);
+        log.info("ActionLog.setGroupSchedule.end");
+    }
+//    {
+//  "daysOfWeek": ["MONDAY", "TUESDAY", "WEDNESDAY"],
+//  "lessonTime": {
+//    "MONDAY": "19:00",
+//    "TUESDAY": "19:00",
+//    "WEDNESDAY": "19:00"
+//  }
+//}
 
 }

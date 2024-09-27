@@ -11,7 +11,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AttendanceSetDto {
     private UserAssignDto userAssignDto;
-    private GroupAssignDto groupAssignDto;
     private AttendanceEnum status;
-
 }

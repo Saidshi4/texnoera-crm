@@ -2,6 +2,7 @@ package com.example.texnoeracrm.controller;
 
 import com.example.texnoeracrm.model.get.GroupGetDto;
 import com.example.texnoeracrm.model.get.UserGetDto;
+import com.example.texnoeracrm.model.set.GroupScheduleSetDto;
 import com.example.texnoeracrm.model.set.GroupSetDto;
 import com.example.texnoeracrm.model.set.UserAssignDto;
 import com.example.texnoeracrm.service.GroupService;
@@ -47,6 +48,11 @@ public class GroupController {
     @DeleteMapping("{groupId}/delete-users")
     public void deleteUsersFromGroup(@PathVariable Long groupId, @RequestBody List<UserAssignDto> userAssignDtos){
         groupService.deleteUsersFromGroup(groupId, userAssignDtos);
+    }
+
+    @PatchMapping("/{groupId}/schedule")
+    public void setGroupSchedule(@PathVariable Long groupId, @RequestBody GroupScheduleSetDto groupScheduleSetDto){
+        groupService.setGroupSchedule(groupId, groupScheduleSetDto);
     }
 
 }
