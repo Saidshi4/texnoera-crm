@@ -1,6 +1,8 @@
 package com.example.texnoeracrm.controller;
 
 
+import com.example.texnoeracrm.exception.AlreadyExistException;
+import com.example.texnoeracrm.exception.InvalidTokenException;
 import com.example.texnoeracrm.exception.NotFoundException;
 import com.example.texnoeracrm.exception.UserNotAuthorizedException;
 import com.example.texnoeracrm.model.get.ExceptionGetDto;
@@ -21,9 +23,23 @@ public class ErrorHandler {
         return new ExceptionGetDto(e.getMessage());
     }
 
+    @ExceptionHandler(AlreadyExistException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ExceptionGetDto handle(AlreadyExistException e){
+        log.error(e.getLog());
+        return new ExceptionGetDto(e.getMessage());
+    }
+
     @ExceptionHandler(UserNotAuthorizedException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionGetDto handle(UserNotAuthorizedException e){
+        log.error(e.getLog());
+        return new ExceptionGetDto(e.getMessage());
+    }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionGetDto handle(InvalidTokenException e){
         log.error(e.getLog());
         return new ExceptionGetDto(e.getMessage());
     }

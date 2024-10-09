@@ -1,5 +1,6 @@
 package com.example.texnoeracrm.dao.entity;
 
+import com.example.texnoeracrm.enums.GenderEnum;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -11,8 +12,8 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
+@Builder
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,6 +30,8 @@ public class UserEntity implements UserDetails {
     private String idCardNo;
     private String personalNo;
     private LocalDate birthdate;
+    @Enumerated(EnumType.STRING)
+    private GenderEnum gender;
     private String phoneNumber;
     private String email;
     private Long diplomaNo;
@@ -38,8 +41,8 @@ public class UserEntity implements UserDetails {
     private Boolean isActive = true;
     private LocalDateTime createdAt;
 
-    @OneToMany(cascade = CascadeType.REMOVE, fetch= FetchType.EAGER,mappedBy = "user")
-    private List<UserRoleEntity> userRoles;
+    @ManyToOne(cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
+    private RoleEntity roleEntity;
 
     @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(
@@ -48,29 +51,19 @@ public class UserEntity implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "group_id"))
     private List<GroupEntity> groupEntities;
 
-    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-    @JoinTable(
-            name = "users_tasks",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "task_id")
-    )
-    private List<TaskEntity> taskEntities;
-
     @OneToMany(mappedBy = "userEntity")
     private List<AttendanceEntity> attendanceEntities;
 
-    @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<DeviceTokenEntity> deviceTokenEntities;
+
+    @OneToMany(mappedBy = "userEntity")
+    private List<UserTaskEntity> userTaskEntities;
 
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if (this.userRoles == null) {
-            return Collections.emptyList();
-        }
-        return this.userRoles.stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getRole().getName()))
-                .collect(Collectors.toList());
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + (this.roleEntity != null ? this.roleEntity.getName() : "UNKNOWN")));
     }
 
     @Override

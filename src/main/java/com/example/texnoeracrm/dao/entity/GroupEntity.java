@@ -12,7 +12,6 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -27,11 +26,14 @@ public class GroupEntity {
     private String lesson;
     private LocalDateTime createdAt;
 
-    @ManyToMany(mappedBy = "groupEntities", cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToMany(mappedBy = "groupEntities", cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER)
     private List<UserEntity> userEntities;
 
     @OneToMany(mappedBy = "groupEntity")
     private List<AttendanceEntity> attendanceEntities;
+
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "groupEntity")
+    private List<TaskEntity> taskEntities;
 
     @ElementCollection(targetClass = DayOfWeek.class)
     @CollectionTable(name = "group_days", joinColumns = @JoinColumn(name = "group_id"))
@@ -40,9 +42,16 @@ public class GroupEntity {
     private Set<DayOfWeek> daysOfWeek;
 
     @ElementCollection
-    @CollectionTable(name = "group_lesson_times", joinColumns = @JoinColumn(name = "group_id"))
+    @CollectionTable(name = "group_lesson_start_times", joinColumns = @JoinColumn(name = "group_id"))
     @MapKeyColumn(name = "day_of_week")
-    @Column(name = "lesson_time")
+    @Column(name = "lesson_start_time")
     @Enumerated(EnumType.STRING)
-    private Map<DayOfWeek, LocalTime> lessonTimes;
+    private Map<DayOfWeek, LocalTime> lessonStartTimes;
+
+    @ElementCollection
+    @CollectionTable(name = "group_lesson_end_times", joinColumns = @JoinColumn(name = "group_id"))
+    @MapKeyColumn(name = "day_of_week")
+    @Column(name = "lesson_end_time")
+    @Enumerated(EnumType.STRING)
+    private Map<DayOfWeek, LocalTime> lessonEndTimes;
 }

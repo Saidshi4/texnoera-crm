@@ -1,8 +1,12 @@
 package com.example.texnoeracrm.controller;
 
+import com.example.texnoeracrm.model.get.AttendanceGetByGroupAndUserDto;
 import com.example.texnoeracrm.model.get.AttendanceGetDto;
 import com.example.texnoeracrm.model.set.AttendanceSetDto;
 import com.example.texnoeracrm.service.AttendanceService;
+import com.example.texnoeracrm.service.auth.JwtService;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
@@ -11,20 +15,28 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/attendances")
+@RequestMapping("/api/attendances")
 @RequiredArgsConstructor
 public class AttendanceController {
 
     private final AttendanceService attendanceService;
+    private final JwtService jwtService;
 
-    @PostMapping("/groups/{groupId}")
-    public void creatAttendances(@PathVariable Long groupId, @RequestBody List<AttendanceSetDto> attendanceSetDtoList){
-        attendanceService.createAttendances(groupId, attendanceSetDtoList);
+    @PostMapping("/groups")
+    public void creatAttendances(){
+        attendanceService.createAttendances();
     }
 
-    @GetMapping("/{attendanceId}")
-    public AttendanceGetDto getAttendance(@PathVariable Long attendanceId){
-        return attendanceService.getAttendance(attendanceId);
+    @GetMapping("/{groupId}")
+    public List<AttendanceGetDto> getAttendance(@PathVariable Long groupId){
+        return attendanceService.getAttendances(groupId);
+    }
+
+    @PatchMapping("/groups/{groupId}")
+    public void enterAttendance(@PathVariable Long groupId,
+                                @RequestParam("expectedDate") @DateTimeFormat(pattern = "yyyy-M-d") LocalDate expectedDate,
+                                @RequestBody List<AttendanceSetDto> attendanceSetDtos){
+        attendanceService.enterAttendances(groupId, expectedDate, attendanceSetDtos);
     }
 
     @GetMapping
@@ -39,6 +51,13 @@ public class AttendanceController {
             @RequestParam("toDate") @DateTimeFormat(pattern = "yyyy-M-d") LocalDate toDate) {
 
         return attendanceService.getAttendancesByGroupAndDateRange(groupId, fromDate, toDate);
+    }
+
+    @GetMapping("/users/groups/{groupId}")
+    public List<AttendanceGetByGroupAndUserDto> getAttendancesByGroup(HttpServletRequest request, @PathVariable Long groupId) {
+        String token = (String) request.getAttribute("token");
+        Long userId = jwtService.extractUserIdFromAccessToken(token, true);
+        return attendanceService.getByGroupIdAndUserId(groupId, userId);
     }
 
 

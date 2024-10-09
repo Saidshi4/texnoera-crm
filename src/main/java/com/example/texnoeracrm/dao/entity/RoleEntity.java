@@ -20,7 +20,7 @@ public class RoleEntity {
     private Long id;
     @Enumerated(EnumType.STRING)
     private RoleEnum name;
-    @OneToMany(mappedBy = "role")
-    private List<UserRoleEntity> userRoleEntity;
+    @OneToMany(mappedBy = "roleEntity")
+    private List<UserEntity> userEntities;
 
 }

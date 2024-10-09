@@ -1,38 +1,34 @@
 package com.example.texnoeracrm.controller;
 
 import com.example.texnoeracrm.model.get.TaskGetDto;
+import com.example.texnoeracrm.model.get.UserTaskGetDto;
 import com.example.texnoeracrm.model.set.TaskSetDto;
 import com.example.texnoeracrm.service.TaskService;
+import com.example.texnoeracrm.service.auth.JwtService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/tasks")
+@RequestMapping("/api/tasks")
 @RequiredArgsConstructor
 public class TaskController {
 
     private final TaskService taskService;
+    private final JwtService jwtService;
 
-    @PostMapping
-    public void creatTasks(@RequestBody TaskSetDto taskSetDto){
-        taskService.createTask(taskSetDto);
+    @PostMapping("/groups/{groupId}")
+    public void creatTasks(@PathVariable Long groupId, @RequestBody TaskSetDto taskSetDto){
+        taskService.createTask(groupId, taskSetDto);
     }
 
-    @GetMapping("/{taskId}")
-    public TaskGetDto getTask(@PathVariable Long taskId){
-        return taskService.getTask(taskId);
-    }
-
-    @GetMapping
-    public List<TaskGetDto> getAllTasks(){
-        return taskService.getAllTasks();
+    @GetMapping("/groups/{groupId}")
+    public List<TaskGetDto> getTasks(HttpServletRequest request, @PathVariable Long groupId){
+        String token = (String) request.getAttribute("token");
+        Long userId = jwtService.extractUserIdFromAccessToken(token, true);
+        return taskService.findTaskByUserIdAndGroupId(userId, groupId);
     }
 
 }

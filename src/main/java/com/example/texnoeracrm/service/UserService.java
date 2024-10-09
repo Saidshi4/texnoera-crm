@@ -5,6 +5,7 @@ import com.example.texnoeracrm.dao.repository.UserRepository;
 import com.example.texnoeracrm.enums.ExceptionEnum;
 import com.example.texnoeracrm.exception.NotFoundException;
 import com.example.texnoeracrm.mapper.UserMapper;
+import com.example.texnoeracrm.model.get.GroupUserGetDto;
 import com.example.texnoeracrm.model.get.UserGetDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    public UserEntity findById(Long userId) {
+    private UserEntity findById(Long userId) {
         log.info("ActionLog.userFindById.start userId {}", userId);
         UserEntity userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(
@@ -30,21 +31,31 @@ public class UserService {
         return userEntity;
     }
 
+    private UserEntity findByUsername(String username) {
+        log.info("ActionLog.userFindByUsername.start username {}", username);
+        UserEntity userEntity = userRepository.findUserEntityByUsername(username)
+                .orElseThrow(() -> new NotFoundException(
+                        ExceptionEnum.USER_NOT_FOUND_BY_USERNAME.name(),
+                        String.format(ExceptionEnum.USER_NOT_FOUND_BY_USERNAME.getLog(), username)
+                ));
+        log.info("ActionLog.userFindByUsername.end username {}", username);
+        return userEntity;
+    }
 
-    public UserGetDto getUser(Long userId) {
-        log.info("ActionLog.getUser.start userId {}", userId);
-        UserEntity userEntity = findById(userId);
+    public UserGetDto getUser(String username) {
+        log.info("ActionLog.getUser.start username {}", username);
+        UserEntity userEntity = findByUsername(username);
         UserGetDto userGetDto = userMapper.mapToDto(userEntity);
-        log.info("ActionLog.getUser.end userId {}", userId);
+        log.info("ActionLog.getUser.end username {}", username);
         return userGetDto;
     }
 
-    public List<UserGetDto> getAllUser() {
-        log.info("ActionLog.getAllUser.start");
-        List<UserEntity> userEntities = userRepository.findAll();
-        List<UserGetDto> userGetDtos = userMapper.mapToDtos(userEntities);
-        log.info("ActionLog.getAllUser.end");
-        return userGetDtos;
+    public List<GroupUserGetDto> getUsersByGroupId(Long groupId) {
+        log.info("ActionLog.getUsersByGroupId.start groupId {}", groupId);
+        List<UserEntity> userEntities = userRepository.findByGroupId(groupId);
+        List<GroupUserGetDto> groupUserGetDtos = userMapper.mapToGroupUserDtos(userEntities);
+        log.info("ActionLog.getUsersByGroupId.end groupId {}", groupId);
+        return groupUserGetDtos;
     }
 
     public void deleteUser(Long userId) {

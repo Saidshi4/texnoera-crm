@@ -13,5 +13,8 @@ public class GroupGetDto {
     private Long id;
     private String name;
     private String lesson;
-    private List<UserGetDto> userGetDtos;
+//    private List<AttendanceGetDto> attendanceGetDtos;
+//    private List<TaskGetDto> taskGetDtos;
+//    private List<UserGetDto> userGetDtos;
+
 }

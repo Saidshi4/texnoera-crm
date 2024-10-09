@@ -8,10 +8,12 @@ import lombok.Getter;
 public enum ExceptionEnum {
     USER_NOT_FOUND("ActionLog.findById.error user %d not found"),
     USER_NOT_FOUND_BY_USERNAME("ActionLog.findByUsername.error user %s not found"),
+    EMAIL_ALREADY_EXISTS("ActionLog.findByEmail.error email %s already exists"),
     GROUP_NOT_FOUND("ActionLog.findById.error teacher %d not found"),
     TASK_NOT_FOUND("ActionLog.findById.error task %d not found"),
     ATTENDANCE_NOT_FOUND("ActionLog.findById.error attendance %d not found"),
-    PASSWORD_DONT_MATCH("ActionLog.authenticate.error");
+    PASSWORD_DONT_MATCH("ActionLog.authenticate.error"),
+    INVALID_TOKEN("ActionLog.authenticate.error.token invalid");
 
     private final String log;
 }

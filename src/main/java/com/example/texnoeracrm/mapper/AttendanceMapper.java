@@ -1,6 +1,7 @@
 package com.example.texnoeracrm.mapper;
 
 import com.example.texnoeracrm.dao.entity.AttendanceEntity;
+import com.example.texnoeracrm.model.get.AttendanceGetByGroupAndUserDto;
 import com.example.texnoeracrm.model.get.AttendanceGetDto;
 import com.example.texnoeracrm.model.set.AttendanceSetDto;
 import org.mapstruct.Mapper;
@@ -22,4 +23,5 @@ public interface AttendanceMapper {
 
     List<AttendanceGetDto> mapToDtos(List<AttendanceEntity> attendanceEntities);
 
+    List<AttendanceGetByGroupAndUserDto> mapToGroupAndUserDtos(List<AttendanceEntity> attendanceEntities);
 }

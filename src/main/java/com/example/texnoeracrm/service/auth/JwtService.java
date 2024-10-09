@@ -6,7 +6,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.core.GrantedAuthority;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -27,12 +28,7 @@ public class JwtService {
     private static final long ACCESS_TOKEN_EXPIRATION_TIME = 1000 * 60 * 24; // 24 hours
     private static final long REFRESH_TOKEN_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 7; // 7 days
 
-    public Long extractUserIdFromAccessToken(HttpServletRequest request, boolean isAccessToken) {
-
-        String token = request.getHeader("Authorization");
-        if (token == null || !token.startsWith("Bearer ")) {
-            throw new IllegalArgumentException("Invalid token");
-        }
+    public Long extractUserIdFromAccessToken(String token, boolean isAccessToken) {
 
         try {
             Claims claims;
@@ -48,6 +44,7 @@ public class JwtService {
             return null;
         }
     }
+
     public String extractUsernameAccess(String token) {
         return extractClaimAccess(token, Claims::getSubject);
     }
@@ -83,8 +80,7 @@ public class JwtService {
         log.info("UserEntity successfully cast from UserDetails. userId: {}, role: {}", userEntity.getId(), userEntity.getAuthorities());
 
         extraClaims.put("userId", userEntity.getId());
-        extraClaims.put("role", userEntity.getAuthorities().iterator().next().getAuthority());
-
+        extraClaims.put("role", userEntity.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
         log.info("Extra claims added: {}", extraClaims);
 
         String token = Jwts
@@ -127,10 +123,11 @@ public class JwtService {
     }
 
 
-    public Boolean isAccessTokenValid(String token,UserDetails userDetails) {
+    public Boolean isAccessTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsernameAccess(token);
         return (username.equals(userDetails.getUsername())) && !isAccessTokenExpired(token);
     }
+
     public Boolean isRefreshTokenValid(String token,UserDetails userDetails) {
         final String username = extractUsernameRefresh(token);
         return (username.equals(userDetails.getUsername())) && !isRefreshTokenExpired(token);

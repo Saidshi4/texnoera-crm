@@ -1,13 +1,22 @@
 package com.example.texnoeracrm.service;
 
+import com.example.texnoeracrm.dao.entity.AttendanceEntity;
 import com.example.texnoeracrm.dao.entity.GroupEntity;
+import com.example.texnoeracrm.dao.entity.TaskEntity;
 import com.example.texnoeracrm.dao.entity.UserEntity;
+import com.example.texnoeracrm.dao.repository.AttendanceRepository;
 import com.example.texnoeracrm.dao.repository.GroupRepository;
+import com.example.texnoeracrm.dao.repository.TaskRepository;
 import com.example.texnoeracrm.dao.repository.UserRepository;
 import com.example.texnoeracrm.enums.ExceptionEnum;
 import com.example.texnoeracrm.exception.NotFoundException;
+import com.example.texnoeracrm.mapper.AttendanceMapper;
 import com.example.texnoeracrm.mapper.GroupMapper;
+import com.example.texnoeracrm.mapper.TaskMapper;
+import com.example.texnoeracrm.model.get.AttendanceGetDto;
+import com.example.texnoeracrm.model.get.GroupByUserIdGetDto;
 import com.example.texnoeracrm.model.get.GroupGetDto;
+import com.example.texnoeracrm.model.get.TaskGetDto;
 import com.example.texnoeracrm.model.set.GroupScheduleSetDto;
 import com.example.texnoeracrm.model.set.GroupSetDto;
 import com.example.texnoeracrm.model.set.UserAssignDto;
@@ -27,6 +36,11 @@ public class GroupService {
     private final GroupRepository groupRepository;
     private final GroupMapper groupMapper;
     private final UserRepository userRepository;
+    private final AttendanceRepository attendanceRepository;
+    private final AttendanceMapper attendanceMapper;
+    private final TaskRepository taskRepository;
+    private final TaskMapper taskMapper;
+
     private GroupEntity findById(Long groupId) {
         log.info("ActionLog.groupFindById.start groupId {}", groupId);
         GroupEntity groupEntity = groupRepository.findById(groupId)
@@ -58,13 +72,6 @@ public class GroupService {
         log.info("ActionLog.createGroup.end");
     }
 
-    public GroupGetDto getGroup(Long groupId) {
-        log.info("ActionLog.getGroup.start groupId {}", groupId);
-        GroupEntity groupEntity = findById(groupId);
-        GroupGetDto groupGetDto = groupMapper.mapToDto(groupEntity);
-        log.info("ActionLog.getGroup.end groupId {}", groupId);
-        return groupGetDto;
-    }
 
     public List<GroupGetDto> getAllGroups() {
         log.info("ActionLog.getAllGroups.start");
@@ -124,9 +131,18 @@ public class GroupService {
         log.info("ActionLog.setGroupSchedule.start");
         GroupEntity groupEntity = findById(groupId);
         groupEntity.setDaysOfWeek(groupScheduleSetDto.getDaysOfWeek());
-        groupEntity.setLessonTimes(groupScheduleSetDto.getLessonTime());
+        groupEntity.setLessonStartTimes(groupScheduleSetDto.getLessonStartTime());
+        groupEntity.setLessonEndTimes(groupScheduleSetDto.getLessonEndTime());
         groupRepository.save(groupEntity);
         log.info("ActionLog.setGroupSchedule.end");
+    }
+
+    public List<GroupByUserIdGetDto> getGroupByUserId(Long userId) {
+        log.info("ActionLog.getGroupByUsername.start");
+        List<GroupEntity> groupEntities = groupRepository.findGroupsByUserId(userId);
+        List<GroupByUserIdGetDto> groups = groupMapper.mapToGroupByUserIdDtos(groupEntities);
+        log.info("ActionLog.getGroupByUsername.end");
+        return groups;
     }
 //    {
 //  "daysOfWeek": ["MONDAY", "TUESDAY", "WEDNESDAY"],

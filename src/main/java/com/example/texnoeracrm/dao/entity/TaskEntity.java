@@ -1,19 +1,14 @@
 package com.example.texnoeracrm.dao.entity;
 
-import com.example.texnoeracrm.enums.TaskStatusEnum;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Entity
@@ -28,9 +23,13 @@ public class TaskEntity {
     private Long id;
     private String name;
     private String description;
-    private TaskStatusEnum status;
     private LocalDateTime createdAt;
+    private LocalDate deadlineDay;
+    private LocalTime deadlineTime;
 
-    @ManyToMany(mappedBy = "taskEntities", cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-    private List<UserEntity> userEntities;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private GroupEntity groupEntity;
+
+    @OneToMany(mappedBy = "taskEntity")
+    private List<UserTaskEntity> userTaskEntities;
 }

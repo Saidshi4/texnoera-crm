@@ -14,5 +14,6 @@ import java.util.Set;
 @AllArgsConstructor
 public class GroupScheduleSetDto {
     private Set<DayOfWeek> daysOfWeek;
-    private Map<DayOfWeek, LocalTime> lessonTime;
+    private Map<DayOfWeek, LocalTime> lessonStartTime;
+    private Map<DayOfWeek, LocalTime> lessonEndTime;
 }

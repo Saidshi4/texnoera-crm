@@ -3,6 +3,7 @@ package com.example.texnoeracrm.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -27,9 +28,7 @@ public class SecurityConfiguration {
         http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/api/auth/admin/**").hasRole("ADMIN")
-                                .requestMatchers("/api/auth/public/**").permitAll()
-                                .requestMatchers("/api/users/**").hasAnyRole("TEACHER", "MENTOR", "STUDENT")
+                        auth.requestMatchers("/api/**").permitAll()
                                 .requestMatchers(permitSwagger).permitAll()
                                 .anyRequest().authenticated());
 //        http.oauth2ResourceServer((oauth2) -> oauth2

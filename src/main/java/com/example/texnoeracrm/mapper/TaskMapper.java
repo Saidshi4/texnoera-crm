@@ -4,6 +4,7 @@ import com.example.texnoeracrm.dao.entity.TaskEntity;
 import com.example.texnoeracrm.model.get.TaskGetDto;
 import com.example.texnoeracrm.model.set.TaskSetDto;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.util.List;
 

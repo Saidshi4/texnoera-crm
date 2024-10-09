@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,4 +20,14 @@ public interface AttendanceRepository extends JpaRepository<AttendanceEntity, Lo
 
     @Query("select a from AttendanceEntity a where a.groupEntity = :groupEntity and a.userEntity = :userEntity order by a.createdAt desc")
     AttendanceEntity findLastByGroupEntityAndUserEntity(@Param("groupEntity") GroupEntity groupEntity, @Param("userEntity") UserEntity userEntity);
+
+    @Query("select a from AttendanceEntity a where a.groupEntity.id = :groupId")
+    List<AttendanceEntity> findByGroupId(@Param("groupId") Long groupId);
+
+    @Query("select a from AttendanceEntity a where a.groupEntity.id =:groupId " +
+            "and a.expectedAttendanceDate =:expectedAttendanceDate")
+    List<AttendanceEntity> findByGroupIdAndExpectedAttendanceDate(@Param("groupId") Long groupId, @Param("expectedAttendanceDate") LocalDate expectedAttendanceDate);
+
+    @Query("select a from AttendanceEntity a where a.groupEntity.id = :groupId and a.userEntity.id = :userId")
+    List<AttendanceEntity> findByUserIdAndGroupId(@Param("userId") Long userId, @Param("groupId") Long groupId);
 }

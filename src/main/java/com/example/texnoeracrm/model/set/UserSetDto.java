@@ -22,4 +22,5 @@ public class UserSetDto {
     private String email;
     @Schema(description = "ADMIN, STUDENT, TEACHER, MENTOR")
     private RoleEnum role;
+
 }

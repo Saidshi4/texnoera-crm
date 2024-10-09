@@ -16,7 +16,6 @@ public class FirebaseMessagingService {
         this.firebaseMessaging = firebaseMessaging;
     }
 
-
     public void sendNotification(Note note, String token) throws FirebaseMessagingException {
 
         Notification notification = Notification

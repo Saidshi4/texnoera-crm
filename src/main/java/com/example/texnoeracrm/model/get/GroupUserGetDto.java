@@ -8,19 +8,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserGetDto {
-    private Long id;
+public class GroupUserGetDto {
     private String name;
     private String surname;
-    private String fatherName;
-    private String username;
-    private String email;
-    private String phoneNumber;
-    private String birthdate;
     @Enumerated(EnumType.STRING)
     private GenderEnum gender;
     @Enumerated(EnumType.STRING)

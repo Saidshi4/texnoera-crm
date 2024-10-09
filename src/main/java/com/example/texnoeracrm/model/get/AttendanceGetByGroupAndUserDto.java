@@ -7,15 +7,12 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AttendanceGetDto {
+public class AttendanceGetByGroupAndUserDto {
     private Long id;
-    private UserAttendanceGetDto userAttendanceGetDto;
-    private GroupAttendanceGetDto groupAttendanceGetDto;
     private AttendanceEnum status;
     private LocalDateTime dateTime;
     private LocalDate expectedAttendanceDate;

@@ -9,11 +9,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -22,6 +20,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Table(name = "attendances")
+@Builder
 public class AttendanceEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,5 +31,6 @@ public class AttendanceEntity {
     private GroupEntity groupEntity;
     @Enumerated(EnumType.STRING)
     private AttendanceEnum status;
+    private LocalDate expectedAttendanceDate;
     private LocalDateTime createdAt;
 }
