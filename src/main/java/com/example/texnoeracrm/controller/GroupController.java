@@ -25,8 +25,7 @@ public class GroupController {
     public void creatGroup(@RequestBody GroupSetDto groupSetDto){
         groupService.createGroup(groupSetDto);
     }
-
-
+    
     @GetMapping
     public List<GroupGetDto> getAllGroups(){
         return groupService.getAllGroups();

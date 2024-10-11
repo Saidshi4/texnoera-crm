@@ -17,6 +17,9 @@ public interface TaskRepository extends JpaRepository<TaskEntity, Long> {
     @Query("select t from TaskEntity t join users_tasks ut on ut.taskEntity.id = t.id where t.deadlineDay = :date and t.deadlineTime between :start and :end")
     List<TaskEntity> findByDeadline(LocalDate date, LocalTime start, LocalTime end);
 
-    @Query("select t from TaskEntity t join users_tasks ut on t.id = ut.taskEntity.id where ut.userEntity.id = :userId and t.groupEntity.id = :groupId")
-    List<TaskEntity> findByUserIdAndGroupId(Long userId, Long groupId);
+    @Query("select t from TaskEntity t where t.groupEntity.id = :groupId")
+    List<TaskEntity> findByGroupId(Long groupId);
+
+    @Query("select t from TaskEntity t join users_tasks ut on t.id = ut.taskEntity.id where t.groupEntity.id = :groupId and ut.userEntity.id = :userId")
+    List<TaskEntity> findByGroupIdAndUserId(Long groupId, Long userId);
 }

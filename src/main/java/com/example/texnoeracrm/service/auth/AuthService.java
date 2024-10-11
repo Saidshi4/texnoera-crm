@@ -12,9 +12,12 @@ import com.example.texnoeracrm.exception.UserNotAuthorizedException;
 import com.example.texnoeracrm.mapper.UserMapper;
 import com.example.texnoeracrm.model.auth.AuthRequestDto;
 import com.example.texnoeracrm.model.auth.AuthenticationDto;
+import com.example.texnoeracrm.model.get.UserGetDto;
 import com.example.texnoeracrm.model.set.UserSetDto;
+import com.example.texnoeracrm.model.set.UserUpdateSetDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.User;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -36,7 +39,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final RoleRepository roleRepository;
 
-    public void registerUser(UserSetDto userSetDto) {
+    public UserGetDto registerUser(UserSetDto userSetDto) {
         log.info("ActionLog.registerUser.start");
         UserEntity userByEmail = userRepository.findByEmail(userSetDto.getEmail()).orElse(null);
 
@@ -47,21 +50,48 @@ public class AuthService {
         }
         RoleEntity roleEntity = roleRepository.findByName(userSetDto.getRole());
         UserEntity userEntity = userMapper.mapToEntity(userSetDto);
-        userEntity.setUsername(generateUsername(userSetDto));
+        userEntity.setUsername(generateUsername(userSetDto.getName(), userSetDto.getSurname(), userSetDto.getRole().name()));
         userEntity.setPassword(passwordEncoder.encode(generatePassword(userEntity)));
         userEntity.setCreatedAt(LocalDateTime.now());
         userEntity.setRoleEntity(roleEntity);
-
+        UserGetDto userGetDto = userMapper.mapToDto(userEntity);
         userRepository.save(userEntity);
-
         log.info("ActionLog.registerUser.end");
+        return userGetDto;
     }
 
-    private String generateUsername(UserSetDto userSetDto) {
+    public UserGetDto updateUser(UserUpdateSetDto userUpdateSetDto) {
+        log.info("ActionLog.updateUser.start");
+        UserEntity userByEmail = userRepository.findByEmail(userUpdateSetDto.getOldEmail()).orElse(null);
+        if (userByEmail == null){
+            throw  new NotFoundException(ExceptionEnum.USER_NOT_FOUND_BY_EMAIL.name(),
+                    String.format(ExceptionEnum.USER_NOT_FOUND_BY_EMAIL.getLog(), userUpdateSetDto.getOldEmail())
+            );
+        }
+        RoleEntity roleEntity = roleRepository.findByName(userUpdateSetDto.getRole());
+        userByEmail.setName(userUpdateSetDto.getName());
+        userByEmail.setSurname(userUpdateSetDto.getSurname());
+        userByEmail.setFatherName(userUpdateSetDto.getFatherName());
+        userByEmail.setIdCardNo(userUpdateSetDto.getIdCardNo());
+        userByEmail.setPersonalNo(userUpdateSetDto.getPersonalNo());
+        userByEmail.setBirthdate(userUpdateSetDto.getBirthdate());
+        userByEmail.setPhoneNumber(userUpdateSetDto.getPhoneNumber());
+        userByEmail.setEmail(userUpdateSetDto.getNewEmail());
+        userByEmail.setRoleEntity(roleEntity);
+        userByEmail.setGender(userUpdateSetDto.getGender());
+        userByEmail.setUsername(generateUsername(userUpdateSetDto.getName(),
+                userUpdateSetDto.getSurname(), userUpdateSetDto.getRole().name()));
+        userByEmail.setPassword(passwordEncoder.encode(generatePassword(userByEmail)));
+        UserGetDto userGetDto = userMapper.mapToDto(userByEmail);
+        userRepository.save(userByEmail);
+        log.info("ActionLog.updateUser.end");
+        return userGetDto;
+    }
+
+
+
+    private String generateUsername(String name, String surname, String role) {
         log.info("ActionLog.generateUsername.start");
-        String name = userSetDto.getName();
-        String surname = userSetDto.getSurname();
-        String role = userSetDto.getRole().toString();
 
         String baseUsername = name.toLowerCase().charAt(0) + surname.toLowerCase() + "." + role.toLowerCase().charAt(0);
         String topUsername = userRepository.findTopByUsernameLikeOrderByUsernameDesc(baseUsername + "%");

@@ -19,6 +19,6 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     @Query("select u from UserEntity u where u.email = :email")
     Optional<UserEntity> findByEmail(@Param("email") String email);
 
-    @Query(value = "select * from users as u join users_groups as ug on u.id = ug.user_id where ug.group_id = :groupId", nativeQuery = true)
+    @Query(value = "select u from UserEntity as u join users_groups as ug on u.id = ug.userEntity.id where ug.groupEntity.id = :groupId")
     List<UserEntity> findByGroupId(Long groupId);
 }

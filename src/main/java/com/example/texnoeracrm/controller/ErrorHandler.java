@@ -1,11 +1,9 @@
 package com.example.texnoeracrm.controller;
 
 
-import com.example.texnoeracrm.exception.AlreadyExistException;
-import com.example.texnoeracrm.exception.InvalidTokenException;
-import com.example.texnoeracrm.exception.NotFoundException;
-import com.example.texnoeracrm.exception.UserNotAuthorizedException;
+import com.example.texnoeracrm.exception.*;
 import com.example.texnoeracrm.model.get.ExceptionGetDto;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -30,6 +28,13 @@ public class ErrorHandler {
         return new ExceptionGetDto(e.getMessage());
     }
 
+    @ExceptionHandler(IncorrectPasswordException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ExceptionGetDto handle(IncorrectPasswordException e){
+        log.error(e.getLog());
+        return new ExceptionGetDto(e.getMessage());
+    }
+
     @ExceptionHandler(UserNotAuthorizedException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionGetDto handle(UserNotAuthorizedException e){
@@ -38,7 +43,7 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler(InvalidTokenException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
     public ExceptionGetDto handle(InvalidTokenException e){
         log.error(e.getLog());
         return new ExceptionGetDto(e.getMessage());
@@ -49,5 +54,12 @@ public class ErrorHandler {
     public ExceptionGetDto handle(Exception e){
         log.error(e.getMessage());
         return new ExceptionGetDto("UNEXPECTED_EXCEPTION");
+    }
+
+    @ExceptionHandler(ExpiredJwtException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ExceptionGetDto handle(ExpiredJwtException e){
+        log.error(e.getMessage());
+        return new ExceptionGetDto("JWT_TOKEN_EXPIRED");
     }
 }

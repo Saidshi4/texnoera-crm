@@ -6,6 +6,7 @@ import com.example.texnoeracrm.model.get.GroupUserGetDto;
 import com.example.texnoeracrm.model.get.UserGetDto;
 import com.example.texnoeracrm.model.set.UserAssignDto;
 import com.example.texnoeracrm.model.set.UserSetDto;
+import com.example.texnoeracrm.model.set.UserUpdateSetDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -16,6 +17,9 @@ import java.util.stream.Collectors;
 public interface UserMapper {
 
     UserEntity mapToEntity(UserSetDto userSetDto);
+
+    @Mapping(target = "email", source = "newEmail")
+    UserEntity mapFromUpdateDtoToEntity(UserUpdateSetDto userUpdateSetDto);
 
     @Mapping(target = "role", source = "roleEntity.name")
     UserGetDto mapToDto(UserEntity userEntity);

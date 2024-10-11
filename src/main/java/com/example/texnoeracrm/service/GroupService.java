@@ -1,22 +1,12 @@
 package com.example.texnoeracrm.service;
 
-import com.example.texnoeracrm.dao.entity.AttendanceEntity;
-import com.example.texnoeracrm.dao.entity.GroupEntity;
-import com.example.texnoeracrm.dao.entity.TaskEntity;
-import com.example.texnoeracrm.dao.entity.UserEntity;
-import com.example.texnoeracrm.dao.repository.AttendanceRepository;
-import com.example.texnoeracrm.dao.repository.GroupRepository;
-import com.example.texnoeracrm.dao.repository.TaskRepository;
-import com.example.texnoeracrm.dao.repository.UserRepository;
+import com.example.texnoeracrm.dao.entity.*;
+import com.example.texnoeracrm.dao.repository.*;
 import com.example.texnoeracrm.enums.ExceptionEnum;
 import com.example.texnoeracrm.exception.NotFoundException;
-import com.example.texnoeracrm.mapper.AttendanceMapper;
 import com.example.texnoeracrm.mapper.GroupMapper;
-import com.example.texnoeracrm.mapper.TaskMapper;
-import com.example.texnoeracrm.model.get.AttendanceGetDto;
 import com.example.texnoeracrm.model.get.GroupByUserIdGetDto;
 import com.example.texnoeracrm.model.get.GroupGetDto;
-import com.example.texnoeracrm.model.get.TaskGetDto;
 import com.example.texnoeracrm.model.set.GroupScheduleSetDto;
 import com.example.texnoeracrm.model.set.GroupSetDto;
 import com.example.texnoeracrm.model.set.UserAssignDto;
@@ -27,7 +17,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -36,10 +25,7 @@ public class GroupService {
     private final GroupRepository groupRepository;
     private final GroupMapper groupMapper;
     private final UserRepository userRepository;
-    private final AttendanceRepository attendanceRepository;
-    private final AttendanceMapper attendanceMapper;
-    private final TaskRepository taskRepository;
-    private final TaskMapper taskMapper;
+    private final UserGroupRepository userGroupRepository;
 
     private GroupEntity findById(Long groupId) {
         log.info("ActionLog.groupFindById.start groupId {}", groupId);
@@ -84,26 +70,17 @@ public class GroupService {
     public void addUsersToGroup(Long groupId, List<UserAssignDto> userAssignDtos) {
         log.info("ActionLog.addUsersToGroup.start");
         GroupEntity groupEntity = findById(groupId);
+        List<UserGroupEntity> userGroups = userGroupRepository.findByGroupId(groupId);
+        List<UserEntity> existUsers = new ArrayList<>();
+        userGroups.forEach(userGroup -> existUsers.add(userGroup.getUserEntity()));
         for (UserAssignDto userAssignDto : userAssignDtos) {
             UserEntity userEntity = findUserById(userAssignDto.getId());
-            if (userEntity.getGroupEntities() == null) {
-                userEntity.setGroupEntities(new ArrayList<>());
-            }
-            if (!userEntity.getGroupEntities().contains(groupEntity)) {
-                userEntity.getGroupEntities().add(groupEntity);
-                userRepository.save(userEntity);
-            }
-        }
-        if (groupEntity.getUserEntities() == null) {
-            groupEntity.setUserEntities(new ArrayList<>());
-        }
-        List<UserEntity> existingUsers = groupEntity.getUserEntities();
-        List<UserEntity> newUsers = userRepository
-                .findAllById(userAssignDtos.stream().map(UserAssignDto::getId)
-                        .collect(Collectors.toList()));
-        for (UserEntity newUser : newUsers) {
-            if (!existingUsers.contains(newUser)) {
-                groupEntity.getUserEntities().add(newUser);
+            if (!existUsers.contains(userEntity)){
+                UserGroupEntity userGroupEntity = UserGroupEntity.builder()
+                        .userEntity(userEntity)
+                        .groupEntity(groupEntity)
+                        .build();
+                userGroupRepository.save(userGroupEntity);
             }
         }
         groupRepository.save(groupEntity);
@@ -112,18 +89,9 @@ public class GroupService {
 
     public void deleteUsersFromGroup(Long groupId, List<UserAssignDto> userAssignDtos){
         log.info("ActionLog.deleteUsersToGroup.start");
-        GroupEntity groupEntity = findById(groupId);
-        for (UserAssignDto userAssignDto : userAssignDtos) {
-            UserEntity userEntity = findUserById(userAssignDto.getId());
-            if (userEntity.getGroupEntities().contains(groupEntity)) {
-                userEntity.getGroupEntities().remove(groupEntity);
-                userRepository.save(userEntity);
-            }
-        }
-        groupEntity.getUserEntities()
-                .removeIf(userEntity -> userAssignDtos.stream()
-                        .anyMatch(dto -> dto.getId().equals(userEntity.getId())));
-        groupRepository.save(groupEntity);
+        userAssignDtos.forEach(
+                userAssignDto -> userGroupRepository.deleteByGroupIdAndUserId(groupId, userAssignDto.getId())
+        );
         log.info("ActionLog.deleteUsersToGroup.end");
     }
 

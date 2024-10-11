@@ -26,8 +26,8 @@ public class GroupEntity {
     private String lesson;
     private LocalDateTime createdAt;
 
-    @ManyToMany(mappedBy = "groupEntities", cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER)
-    private List<UserEntity> userEntities;
+    @OneToMany(mappedBy = "groupEntity")
+    private List<UserGroupEntity> userGroupEntities;
 
     @OneToMany(mappedBy = "groupEntity")
     private List<AttendanceEntity> attendanceEntities;

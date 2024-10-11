@@ -1,7 +1,6 @@
 package com.example.texnoeracrm.dao.repository;
 
 import com.example.texnoeracrm.dao.entity.GroupEntity;
-import com.example.texnoeracrm.model.get.GroupGetDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -22,10 +21,7 @@ public interface GroupRepository extends JpaRepository<GroupEntity, Long> {
     @Query("SELECT g FROM GroupEntity g JOIN g.daysOfWeek d WHERE d = :dayOfWeek")
     List<GroupEntity> findByDaysOfWeek(DayOfWeek dayOfWeek);
 
-    @Query(value = "SELECT g.* FROM groups g " +
-            "JOIN users_groups ug ON g.id = ug.group_id " +
-            "JOIN users u ON ug.user_id = u.id " +
-            "WHERE u.id = :userId", nativeQuery = true)
+    @Query("select g from GroupEntity g join users_groups ug on ug.groupEntity.id = g.id where ug.userEntity.id = :userId")
     List<GroupEntity> findGroupsByUserId(@Param("userId") Long userId);
 
 }

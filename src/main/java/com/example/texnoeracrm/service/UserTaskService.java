@@ -1,12 +1,16 @@
 package com.example.texnoeracrm.service;
 
+import com.example.texnoeracrm.dao.entity.NotificationEntity;
 import com.example.texnoeracrm.dao.entity.TaskEntity;
 import com.example.texnoeracrm.dao.entity.UserTaskEntity;
+import com.example.texnoeracrm.dao.repository.NotificationRepository;
 import com.example.texnoeracrm.dao.repository.TaskRepository;
 import com.example.texnoeracrm.dao.repository.UserTaskRepository;
 import com.example.texnoeracrm.enums.TaskStatusEnum;
 import com.example.texnoeracrm.mapper.UserTaskMapper;
+import com.example.texnoeracrm.model.get.UserTaskGetByTeacherDto;
 import com.example.texnoeracrm.model.get.UserTaskGetDto;
+import com.example.texnoeracrm.model.set.TaskGradeSetDto;
 import com.example.texnoeracrm.model.set.UserTaskSetDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -26,11 +30,18 @@ public class UserTaskService {
     private final UserTaskRepository userTaskRepository;
     private final UserTaskMapper userTaskMapper;
     private final TaskRepository taskRepository;
+    private final NotificationRepository notificationRepository;
+
+    private UserTaskEntity findById(Long id) {
+        return userTaskRepository.findById(id).orElse(null);
+    }
 
     public UserTaskGetDto getTask(Long taskId, Long userId) {
         log.info("ActionLog.getUserTask.start taskId {} and userId {}", taskId, userId);
         UserTaskEntity userTaskEntity = userTaskRepository.findByTaskIdAndUserId(taskId, userId);
-        userTaskEntity.setStatus(TaskStatusEnum.IN_PROGRESS);
+        if (userTaskEntity.getStatus().equals(TaskStatusEnum.CREATED)){
+            userTaskEntity.setStatus(TaskStatusEnum.IN_PROGRESS);
+        }
         userTaskRepository.save(userTaskEntity);
         UserTaskGetDto userTaskGetDto = userTaskMapper.mapToDto(userTaskEntity);
         log.info("ActionLog.getUserTask.end taskId {} and userId {}", taskId, userId);
@@ -94,5 +105,39 @@ public class UserTaskService {
         });
         log.info("ActionLog.checkDeadline.end");
     }
+
+    public List<UserTaskGetByTeacherDto> getUserTaskByTeacher(Long groupId, Long taskId) {
+        log.info("ActionLog.getUserTaskByTeacher.start groupId {}", groupId);
+        List<UserTaskEntity> userTasks = userTaskRepository.findByTaskId(taskId);
+        List<UserTaskGetByTeacherDto> userTaskGetByTeacherDtos = userTaskMapper.mapToGetByTeacherDtos(userTasks);
+        log.info("ActionLog.getUserTaskByTeacher.end groupId {}", groupId);
+        return userTaskGetByTeacherDtos;
+    }
+
+    public Integer gradeTask(Long userId, Long taskId, TaskGradeSetDto gradeSetDto){
+        log.info("ActionLog.gradeTask.start");
+        UserTaskEntity userTaskEntity = userTaskRepository.findByTaskIdAndUserId(taskId, userId);
+        NotificationEntity notification = NotificationEntity.builder()
+                .title("Task Graded")
+                .content("Your task '" + userTaskEntity.getTaskEntity().getName() + "' has been graded. You received a grade of: "
+                        + gradeSetDto.getGrade() + ".")
+                .userEntity(userTaskEntity.getUserEntity())
+                .build();
+        userTaskEntity.setGrade(gradeSetDto.getGrade());
+        notificationRepository.save(notification);
+        userTaskRepository.save(userTaskEntity);
+        log.info("ActionLog.gradeTask.end");
+        return gradeSetDto.getGrade();
+    }
+
+    public UserTaskGetDto getStudentTask(Long userTaskId){
+        log.info("ActionLog.getStudentTask.start");
+        UserTaskEntity userTaskEntity = findById(userTaskId);
+        UserTaskGetDto userTaskGetDto = userTaskMapper.mapToDto(userTaskEntity);
+        log.info("ActionLog.getStudentTask.end");
+        return userTaskGetDto;
+    }
+
+
 
 }

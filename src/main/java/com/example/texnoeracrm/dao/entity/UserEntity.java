@@ -34,32 +34,30 @@ public class UserEntity implements UserDetails {
     private GenderEnum gender;
     private String phoneNumber;
     private String email;
-    private Long diplomaNo;
-    private Double averageScore;
     private String username;
     private String password;
+    @Builder.Default
     private Boolean isActive = true;
     private LocalDateTime createdAt;
 
-    @ManyToOne(cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_entity_id")
     private RoleEntity roleEntity;
 
-    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-    @JoinTable(
-            name = "users_groups",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "group_id"))
-    private List<GroupEntity> groupEntities;
+    @OneToMany(mappedBy = "userEntity")
+    private List<UserGroupEntity> userGroupEntities;
 
     @OneToMany(mappedBy = "userEntity")
     private List<AttendanceEntity> attendanceEntities;
 
-    @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "userEntity", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
     private List<DeviceTokenEntity> deviceTokenEntities;
 
     @OneToMany(mappedBy = "userEntity")
     private List<UserTaskEntity> userTaskEntities;
 
+    @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL)
+    private List<NotificationEntity> notifications;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

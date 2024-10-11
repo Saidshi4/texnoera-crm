@@ -27,8 +27,8 @@ public class AttendanceController {
         attendanceService.createAttendances();
     }
 
-    @GetMapping("/{groupId}")
-    public List<AttendanceGetDto> getAttendance(@PathVariable Long groupId){
+    @GetMapping("/groups/{groupId}")
+    public List<LocalDate> getAttendance(@PathVariable Long groupId){
         return attendanceService.getAttendances(groupId);
     }
 
@@ -39,12 +39,15 @@ public class AttendanceController {
         attendanceService.enterAttendances(groupId, expectedDate, attendanceSetDtos);
     }
 
-    @GetMapping
-    public List<AttendanceGetDto> getAllAttendances(){
-        return attendanceService.getAllAttendances();
+    @GetMapping("/groups/{groupId}/byDate")
+    public List<AttendanceGetDto> getAllAttendances(
+            @PathVariable Long groupId,
+            @RequestParam("date") @DateTimeFormat(pattern = "yyyy-M-d") LocalDate date
+    ){
+        return attendanceService.getAttendancesByGroupIdAndDate(groupId, date);
     }
 
-    @GetMapping("/groups/{groupId}")
+    @GetMapping("/groups/{groupId}/filter")
     public List<AttendanceGetDto> getAttendancesByGroupAndDateRange(
             @PathVariable Long groupId,
             @RequestParam("fromDate") @DateTimeFormat(pattern = "yyyy-M-d") LocalDate fromDate,

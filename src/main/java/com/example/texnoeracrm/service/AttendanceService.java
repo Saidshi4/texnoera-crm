@@ -13,14 +13,13 @@ import com.example.texnoeracrm.mapper.UserMapper;
 import com.example.texnoeracrm.model.get.AttendanceGetByGroupAndUserDto;
 import com.example.texnoeracrm.model.get.AttendanceGetDto;
 import com.example.texnoeracrm.model.set.AttendanceSetDto;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -55,13 +54,14 @@ public class AttendanceService {
         return groupEntity;
     }
 
+    @Transactional
     public void createAttendances() {
         log.info("ActionLog.createAttendances.start");
         LocalDate now = LocalDate.now();
         List<GroupEntity> groupEntities = groupRepository.findByDaysOfWeek(now.getDayOfWeek());
         groupEntities.forEach(
                 groupEntity -> {
-                    List<UserEntity> userEntities = groupEntity.getUserEntities();
+                    List<UserEntity> userEntities = userRepository.findByGroupId(groupEntity.getId());
                     userEntities.forEach(
                             userEntity -> {
                                 AttendanceEntity attendanceEntity = AttendanceEntity.builder()
@@ -97,17 +97,16 @@ public class AttendanceService {
     }
 
 
-    public List<AttendanceGetDto> getAttendances(Long groupId) {
+    public List<LocalDate> getAttendances(Long groupId) {
         log.info("ActionLog.getAttendances.start groupId {}", groupId);
-        List<AttendanceEntity> attendanceEntities = attendanceRepository.findByGroupId(groupId);
-        List<AttendanceGetDto> attendanceGetDtos = attendanceMapper.mapToDtos(attendanceEntities);
+        List<LocalDate> expectedDates = attendanceRepository.findByGroupId(groupId);
         log.info("ActionLog.getAttendances.end groupId {}", groupId);
-        return attendanceGetDtos;
+        return expectedDates;
     }
 
-    public List<AttendanceGetDto> getAllAttendances() {
+    public List<AttendanceGetDto> getAttendancesByGroupIdAndDate(Long groupId, LocalDate date) {
         log.info("ActionLog.getAllGroups.start");
-        List<AttendanceEntity> attendanceEntities = attendanceRepository.findAll();
+        List<AttendanceEntity> attendanceEntities = attendanceRepository.findByGroupIdAndExpectedAttendanceDate(groupId, date);
         List<AttendanceGetDto> attendanceGetDtos = attendanceMapper.mapToDtos(attendanceEntities);
         log.info("ActionLog.getAllGroups.end");
         return attendanceGetDtos;
@@ -116,15 +115,12 @@ public class AttendanceService {
     public List<AttendanceGetDto> getAttendancesByGroupAndDateRange(Long groupId, LocalDate fromDate, LocalDate toDate) {
         log.info("ActionLog.getAttendancesByGroupAndDateRange.start");
         GroupEntity groupEntity = findGroupById(groupId);
-        LocalDateTime startDateTime = fromDate.atStartOfDay();
-        LocalDateTime endDateTime = toDate.atTime(LocalTime.MAX);
         List<AttendanceEntity> attendanceEntities = attendanceRepository
-                .findAttendancesByGroupAndDateRange(groupEntity, startDateTime, endDateTime);
+                .findAttendancesByGroupAndDateRange(groupEntity, fromDate, toDate);
         List<AttendanceGetDto> attendanceGetDtos = attendanceMapper.mapToDtos(attendanceEntities);
         log.info("ActionLog.getAttendancesByGroupAndDateRange.end");
         return attendanceGetDtos;
     }
-
 
     public List<AttendanceGetByGroupAndUserDto> getByGroupIdAndUserId(Long groupId, Long userId) {
         log.info("ActionLog.getByGroupIdAndUserId.start");
@@ -133,4 +129,5 @@ public class AttendanceService {
         log.info("ActionLog.getByGroupIdAndUserId.end");
         return attendanceGetDtos;
     }
+
 }

@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Entity(name = "users_tasks")
@@ -26,4 +27,6 @@ public class UserTaskEntity {
     private Integer grade;
     @Enumerated(EnumType.STRING)
     private TaskStatusEnum status;
+    @OneToMany(mappedBy = "taskEntity", cascade = CascadeType.REMOVE)
+    private List<CommentEntity> commentEntities;
 }

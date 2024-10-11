@@ -25,10 +25,15 @@ public class TaskController {
     }
 
     @GetMapping("/groups/{groupId}")
+    public List<TaskGetDto> getTasks(@PathVariable Long groupId){
+        return taskService.findTaskByTeacherGroupId(groupId);
+    }
+
+    @GetMapping("/groups/{groupId}/byStudent")
     public List<TaskGetDto> getTasks(HttpServletRequest request, @PathVariable Long groupId){
         String token = (String) request.getAttribute("token");
         Long userId = jwtService.extractUserIdFromAccessToken(token, true);
-        return taskService.findTaskByUserIdAndGroupId(userId, groupId);
+        return taskService.findTaskByStudentIdAndGroupId(userId, groupId);
     }
 
 }

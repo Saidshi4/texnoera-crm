@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserSetDto {
+public class UserUpdateSetDto {
     private String name;
     private String surname;
     private String fatherName;
@@ -20,7 +20,8 @@ public class UserSetDto {
     private String personalNo;
     private LocalDate birthdate;
     private String phoneNumber;
-    private String email;
+    private String oldEmail;
+    private String newEmail;
     @Schema(description = "ADMIN, STUDENT, TEACHER, MENTOR")
     private RoleEnum role;
     private GenderEnum gender;

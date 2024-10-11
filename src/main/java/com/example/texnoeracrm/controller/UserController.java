@@ -3,6 +3,7 @@ package com.example.texnoeracrm.controller;
 import com.example.texnoeracrm.model.get.GroupUserGetDto;
 import com.example.texnoeracrm.model.get.Note;
 import com.example.texnoeracrm.model.get.UserGetDto;
+import com.example.texnoeracrm.model.set.UserPasswordSetDto;
 import com.example.texnoeracrm.model.set.UserSetDto;
 import com.example.texnoeracrm.service.FirebaseMessagingService;
 import com.example.texnoeracrm.service.UserService;
@@ -36,8 +37,17 @@ public class UserController {
         return userService.getUsersByGroupId(groupId);
     }
 
-    @DeleteMapping("/{userId}")
-    public void deleteUser(@PathVariable Long userId){
+    @PatchMapping("/changePassword")
+    public void changePassword(HttpServletRequest request, @RequestBody UserPasswordSetDto userPasswordSetDto) {
+        String token = (String) request.getAttribute("token");
+        Long userId = jwtService.extractUserIdFromAccessToken(token, true);
+        userService.updatePassword(userId, userPasswordSetDto);
+    }
+
+    @DeleteMapping
+    public void deleteUser(HttpServletRequest request) {
+        String token = (String) request.getAttribute("token");
+        Long userId = jwtService.extractUserIdFromAccessToken(token, true);
         userService.deleteUser(userId);
     }
 

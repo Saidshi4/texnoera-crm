@@ -25,8 +25,8 @@ public class JwtService {
 
     private static final String ACCESS_SECRET_KEY = "4E645267556B58703272357538782F413F4428472B4B6250655368566D597133";
     private static final String REFRESH_SECRET_KEY = "4E645267556B58703272357538782F413F4428472B4B6250655368566D597145";
-    private static final long ACCESS_TOKEN_EXPIRATION_TIME = 1000 * 60 * 24; // 24 hours
-    private static final long REFRESH_TOKEN_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 7; // 7 days
+    private static final long ACCESS_TOKEN_EXPIRATION_TIME = 1000 * 60 * 60 * 24;
+    private static final long REFRESH_TOKEN_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 7;
 
     public Long extractUserIdFromAccessToken(String token, boolean isAccessToken) {
 
@@ -88,7 +88,7 @@ public class JwtService {
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
+                .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION_TIME))
                 .signWith(getAccessSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
 
