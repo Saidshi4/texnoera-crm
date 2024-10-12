@@ -3,7 +3,6 @@ package com.example.texnoeracrm.controller;
 import com.example.texnoeracrm.model.get.UserTaskGetByTeacherDto;
 import com.example.texnoeracrm.model.get.UserTaskGetDto;
 import com.example.texnoeracrm.model.set.TaskGradeSetDto;
-import com.example.texnoeracrm.model.set.UserSetDto;
 import com.example.texnoeracrm.model.set.UserTaskSetDto;
 import com.example.texnoeracrm.service.UserTaskService;
 import com.example.texnoeracrm.service.auth.JwtService;
@@ -13,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequestMapping("/api/userTasks")
+@RequestMapping("/api/v1/users-tasks")
 @RestController
 @RequiredArgsConstructor
 public class UserTaskController {

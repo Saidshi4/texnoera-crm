@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/tasks")
+@RequestMapping("/api/v1/tasks")
 @RequiredArgsConstructor
 public class TaskController {
 
@@ -29,7 +29,7 @@ public class TaskController {
         return taskService.findTaskByTeacherGroupId(groupId);
     }
 
-    @GetMapping("/groups/{groupId}/byStudent")
+    @GetMapping("/groups/{groupId}/by-student")
     public List<TaskGetDto> getTasks(HttpServletRequest request, @PathVariable Long groupId){
         String token = (String) request.getAttribute("token");
         Long userId = jwtService.extractUserIdFromAccessToken(token, true);

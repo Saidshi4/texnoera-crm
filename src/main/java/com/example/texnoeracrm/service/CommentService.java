@@ -39,7 +39,7 @@ public class CommentService {
         return userEntity;
     }
 
-    private UserTaskEntity findUserTask(Long id) {
+    public UserTaskEntity findUserTask(Long id) {
         log.info("ActionLog.userTask.start id {}", id);
         UserTaskEntity userTask = userTaskRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(

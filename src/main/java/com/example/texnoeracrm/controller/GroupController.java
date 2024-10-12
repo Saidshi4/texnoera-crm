@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/groups")
+@RequestMapping("/api/v1/groups")
 @RequiredArgsConstructor
 public class GroupController {
     private final GroupService groupService;
@@ -46,7 +46,7 @@ public class GroupController {
         groupService.setGroupSchedule(groupId, groupScheduleSetDto);
     }
 
-    @GetMapping("/getGroups")
+    @GetMapping("/get-groups")
     public List<GroupByUserIdGetDto> getGroupsByUsername(HttpServletRequest request) {
         String token = (String) request.getAttribute("token");
         Long userId = jwtService.extractUserIdFromAccessToken(token, true);

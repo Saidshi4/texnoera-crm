@@ -13,7 +13,7 @@ import java.util.List;
 public class AuthorizationInterceptor implements HandlerInterceptor {
 
     private static final List<String> EXCLUDED_PATHS = List.of(
-            "/api/auth/public",
+            "/api/v1/auth/public",
             "/v3/api-docs",
             "/swagger-ui/",
             "/swagger-ui/**",

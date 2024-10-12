@@ -1,5 +1,6 @@
 package com.example.texnoeracrm.model.set;
 
+import com.example.texnoeracrm.annotation.ValidPassword;
 import lombok.*;
 
 @Data
@@ -7,5 +8,6 @@ import lombok.*;
 @AllArgsConstructor
 public class UserPasswordSetDto {
     private String oldPassword;
+    @ValidPassword
     private String newPassword;
 }

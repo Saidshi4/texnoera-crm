@@ -29,7 +29,7 @@ public class JwtService {
     private static final long REFRESH_TOKEN_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 7;
 
     public Long extractUserIdFromAccessToken(String token, boolean isAccessToken) {
-
+        log.info("ActionLog.extractUserIdFromAccessToken.start");
         try {
             Claims claims;
             if (isAccessToken) {
@@ -37,10 +37,10 @@ public class JwtService {
             } else {
                 claims = extractAllClaimsRefresh(token.replace("Bearer ", ""));
             }
-
+            log.info("ActionLog.extractUserIdFromAccessToken.end");
             return claims.get("userId", Long.class);
         } catch (Exception e) {
-            // Handle exceptions gracefully (e.g., log, return null)
+            log.error("ActionLog.extractUserIdFromAccessToken.error", e);
             return null;
         }
     }

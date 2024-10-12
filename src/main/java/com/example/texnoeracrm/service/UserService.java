@@ -1,19 +1,28 @@
 package com.example.texnoeracrm.service;
 
 import com.example.texnoeracrm.dao.entity.UserEntity;
+import com.example.texnoeracrm.dao.repository.RoleRepository;
 import com.example.texnoeracrm.dao.repository.UserRepository;
 import com.example.texnoeracrm.enums.ExceptionEnum;
+import com.example.texnoeracrm.enums.GenderEnum;
 import com.example.texnoeracrm.exception.IncorrectPasswordException;
 import com.example.texnoeracrm.exception.NotFoundException;
 import com.example.texnoeracrm.mapper.UserMapper;
 import com.example.texnoeracrm.model.get.GroupUserGetDto;
 import com.example.texnoeracrm.model.get.UserGetDto;
+import com.example.texnoeracrm.model.get.UserSpecGetDto;
 import com.example.texnoeracrm.model.set.UserPasswordSetDto;
+import com.example.texnoeracrm.model.set.UserSpecSetDto;
+import com.example.texnoeracrm.service.specification.UserSpec;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -23,6 +32,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final RoleRepository roleRepository;
 
     private UserEntity findById(Long userId) {
         log.info("ActionLog.userFindById.start userId {}", userId);
@@ -83,5 +93,50 @@ public class UserService {
         userRepository.save(userEntity);
         log.info("ActionLog.deleteUser.end userId {}", userId);
     }
+
+    public List<UserSpecGetDto> findUsers(UserSpecSetDto userSpecSetDto) {
+        log.info("ActionLog.findUsers.start");
+
+        // Specification oluşturma
+        Specification<UserEntity> spec = Specification.where(UserSpec.hasName(userSpecSetDto.getName()))
+                .and(UserSpec.hasSurname(userSpecSetDto.getSurname()))
+                .and(UserSpec.hasFatherName(userSpecSetDto.getFatherName()))
+                .and(UserSpec.hasIdCardNo(userSpecSetDto.getIdCardNo()))
+                .and(UserSpec.hasPersonalNo(userSpecSetDto.getPersonalNo()))
+                .and(UserSpec.hasBirthdate(userSpecSetDto.getFromBirthdate(), userSpecSetDto.getToBirthdate()))
+                .and(UserSpec.hasGender(userSpecSetDto.getGender()))
+                .and(UserSpec.hasPhoneNumber(userSpecSetDto.getPhoneNumber()))
+                .and(UserSpec.hasEmail(userSpecSetDto.getEmail()))
+                .and(UserSpec.hasUsername(userSpecSetDto.getUsername()))
+                .and(UserSpec.isActive(userSpecSetDto.getIsActive()))
+                .and(UserSpec.belongsToGroup(userSpecSetDto.getGroupId()));
+
+        if (userSpecSetDto.getFromCreatedAt() != null && userSpecSetDto.getToCreatedAt() != null) {
+            spec = spec.and(UserSpec.hasCreatedAt(
+                    userSpecSetDto.getFromCreatedAt().atTime(0, 0, 0),
+                    userSpecSetDto.getToCreatedAt().atTime(23, 59, 59, 999999)));
+        }else if (userSpecSetDto.getFromCreatedAt() != null){
+            spec = spec.and(UserSpec.hasCreatedAt(
+                    userSpecSetDto.getFromCreatedAt().atTime(0, 0, 0),
+                    null));
+        }else if (userSpecSetDto.getToCreatedAt() != null){
+            spec = spec.and(UserSpec.hasCreatedAt(
+                    null,
+                    userSpecSetDto.getToCreatedAt().atTime(23, 59, 59, 999999)));
+        }
+
+        if (userSpecSetDto.getRole() != null) {
+            spec = spec.and(UserSpec.hasRole(roleRepository.findByName(userSpecSetDto.getRole())));
+        }
+
+        List<UserEntity> users = userRepository.findAll(spec, Sort.by("name"));
+
+        List<UserSpecGetDto> userSpecGetDtos = userMapper.mapToSpecGetDtos(users);
+
+        log.info("ActionLog.findUsers.end");
+        return userSpecGetDtos;
+    }
+
+
 
 }

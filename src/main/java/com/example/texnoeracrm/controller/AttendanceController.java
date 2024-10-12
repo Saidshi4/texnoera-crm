@@ -15,7 +15,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/attendances")
+@RequestMapping("/api/v1/attendances")
 @RequiredArgsConstructor
 public class AttendanceController {
 
@@ -39,7 +39,7 @@ public class AttendanceController {
         attendanceService.enterAttendances(groupId, expectedDate, attendanceSetDtos);
     }
 
-    @GetMapping("/groups/{groupId}/byDate")
+    @GetMapping("/groups/{groupId}/by-date")
     public List<AttendanceGetDto> getAllAttendances(
             @PathVariable Long groupId,
             @RequestParam("date") @DateTimeFormat(pattern = "yyyy-M-d") LocalDate date

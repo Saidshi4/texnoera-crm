@@ -1,17 +1,17 @@
 package com.example.texnoeracrm.mapper;
 
 import com.example.texnoeracrm.dao.entity.UserEntity;
-import com.example.texnoeracrm.enums.RoleEnum;
 import com.example.texnoeracrm.model.get.GroupUserGetDto;
 import com.example.texnoeracrm.model.get.UserGetDto;
+import com.example.texnoeracrm.model.get.UserSpecGetDto;
 import com.example.texnoeracrm.model.set.UserAssignDto;
 import com.example.texnoeracrm.model.set.UserSetDto;
 import com.example.texnoeracrm.model.set.UserUpdateSetDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
@@ -33,5 +33,10 @@ public interface UserMapper {
 
     @Mapping(target = "id", source = "id")
     UserEntity mapToEntityFromAssignDto(UserAssignDto userAssignDto);
+
+    @Mapping(target = "role", source = "roleEntity.name")
+    UserSpecGetDto mapToSpecGetDto(UserEntity userEntity);
+
+    List<UserSpecGetDto> mapToSpecGetDtos(List<UserEntity> userEntities);
 
 }

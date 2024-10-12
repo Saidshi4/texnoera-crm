@@ -17,7 +17,6 @@ import com.example.texnoeracrm.model.set.UserSetDto;
 import com.example.texnoeracrm.model.set.UserUpdateSetDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.User;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -43,10 +42,10 @@ public class AuthService {
         log.info("ActionLog.registerUser.start");
         UserEntity userByEmail = userRepository.findByEmail(userSetDto.getEmail()).orElse(null);
 
-        if (userByEmail != null){
-                throw  new AlreadyExistException(ExceptionEnum.EMAIL_ALREADY_EXISTS.name(),
-                        String.format(ExceptionEnum.EMAIL_ALREADY_EXISTS.getLog(), userSetDto.getEmail())
-                );
+        if (userByEmail != null) {
+            throw new AlreadyExistException(ExceptionEnum.EMAIL_ALREADY_EXISTS.name(),
+                    String.format(ExceptionEnum.EMAIL_ALREADY_EXISTS.getLog(), userSetDto.getEmail())
+            );
         }
         RoleEntity roleEntity = roleRepository.findByName(userSetDto.getRole());
         UserEntity userEntity = userMapper.mapToEntity(userSetDto);
@@ -63,8 +62,8 @@ public class AuthService {
     public UserGetDto updateUser(UserUpdateSetDto userUpdateSetDto) {
         log.info("ActionLog.updateUser.start");
         UserEntity userByEmail = userRepository.findByEmail(userUpdateSetDto.getOldEmail()).orElse(null);
-        if (userByEmail == null){
-            throw  new NotFoundException(ExceptionEnum.USER_NOT_FOUND_BY_EMAIL.name(),
+        if (userByEmail == null) {
+            throw new NotFoundException(ExceptionEnum.USER_NOT_FOUND_BY_EMAIL.name(),
                     String.format(ExceptionEnum.USER_NOT_FOUND_BY_EMAIL.getLog(), userUpdateSetDto.getOldEmail())
             );
         }
@@ -87,7 +86,6 @@ public class AuthService {
         log.info("ActionLog.updateUser.end");
         return userGetDto;
     }
-
 
 
     private String generateUsername(String name, String surname, String role) {
