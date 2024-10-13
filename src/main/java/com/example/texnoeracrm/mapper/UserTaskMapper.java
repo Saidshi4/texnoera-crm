@@ -20,3 +20,4 @@ public interface UserTaskMapper  {
 
     List<UserTaskGetByTeacherDto> mapToGetByTeacherDtos(List<UserTaskEntity> userTasks);
 }
+

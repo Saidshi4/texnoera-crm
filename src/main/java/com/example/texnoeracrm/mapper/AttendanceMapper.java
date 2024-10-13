@@ -12,7 +12,6 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {UserMapper.class, GroupMapper.class})
 public interface AttendanceMapper {
 
-    @Mapping(source = "userAssignDto", target = "userEntity")
     AttendanceEntity mapToEntity(AttendanceSetDto attendanceSetDto);
 
     List<AttendanceEntity> mapToEntities(List<AttendanceSetDto> attendanceSetDtos);

@@ -20,7 +20,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -77,24 +80,23 @@ public class AttendanceService {
         log.info("ActionLog.createAttendances.end at {}", now);
     }
 
-    public void enterAttendances(Long groupId, LocalDate expectedAttendanceDate, List<AttendanceSetDto> attendanceSetDtos) {
+    public void enterAttendances(Long groupId, List<AttendanceSetDto> attendanceSetDtos) {
         log.info("ActionLog.enterAttendances.start groupId {}", groupId);
         LocalDateTime now = LocalDateTime.now();
-        List<AttendanceEntity> attendanceEntities = attendanceRepository.findByGroupIdAndExpectedAttendanceDate(groupId, expectedAttendanceDate);
-        attendanceSetDtos.forEach(attendanceSetDto -> {
-            AttendanceEntity attendanceEntity = attendanceEntities.stream()
-                    .filter(a -> a.getUserEntity().getId().equals(attendanceSetDto.getUserAssignDto().getId()))
-                    .findFirst()
-                    .orElse(null);
+        System.out.println(attendanceSetDtos.size());
+        attendanceSetDtos.forEach(
+                attendanceSetDto -> {
+                    AttendanceEntity attendance = findById(attendanceSetDto.getId());
+                    System.out.println(attendance.getUserEntity().getName());
+                    attendance.setStatus(attendanceSetDto.getStatus());
+                    attendance.setCreatedAt(now);
+                    attendanceRepository.save(attendance);
+                }
+        );
 
-            if (attendanceEntity != null) {
-                attendanceEntity.setStatus(attendanceSetDto.getStatus());
-                attendanceEntity.setCreatedAt(now);
-                attendanceRepository.save(attendanceEntity);
-            }
-        });
         log.info("ActionLog.enterAttendances.end at {}", now);
     }
+
 
 
     public List<LocalDate> getAttendances(Long groupId) {

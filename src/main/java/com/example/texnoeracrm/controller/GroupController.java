@@ -47,7 +47,7 @@ public class GroupController {
     }
 
     @GetMapping("/get-groups")
-    public List<GroupByUserIdGetDto> getGroupsByUsername(HttpServletRequest request) {
+    public List<GroupByUserIdGetDto> getGroupsByUserId(HttpServletRequest request) {
         String token = (String) request.getAttribute("token");
         Long userId = jwtService.extractUserIdFromAccessToken(token, true);
         return groupService.getGroupByUserId(userId);

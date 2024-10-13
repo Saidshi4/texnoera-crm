@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AttendanceSetDto {
-    private UserAssignDto userAssignDto;
+    private Long id;
     private AttendanceEnum status;
+
 }

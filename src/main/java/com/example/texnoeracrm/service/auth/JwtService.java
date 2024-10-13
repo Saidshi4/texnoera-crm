@@ -8,12 +8,15 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.GrantedAuthority;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -60,10 +63,12 @@ public class JwtService {
         final Claims claims = extractAllClaimsRefresh(token);
         return claimsResolver.apply(claims);
     }
-    public String extractRolesFromToken(String token) {
-        Claims claims = extractAllClaimsAccess(token);
-        return claims.get("role", String.class);
+
+    public List<GrantedAuthority> extractAuthorities(String token) {
+        String role = extractClaimAccess(token, claims -> claims.get("role", String.class));
+        return Collections.singletonList(new SimpleGrantedAuthority(role));
     }
+
     public String generateAccessToken(UserDetails userDetails) {
         return generateAccessToken(new HashMap<>(),userDetails);
     }
@@ -80,7 +85,7 @@ public class JwtService {
         log.info("UserEntity successfully cast from UserDetails. userId: {}, role: {}", userEntity.getId(), userEntity.getAuthorities());
 
         extraClaims.put("userId", userEntity.getId());
-        extraClaims.put("role", userEntity.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
+        extraClaims.put("role", userDetails.getAuthorities().iterator().next().getAuthority());
         log.info("Extra claims added: {}", extraClaims);
 
         String token = Jwts

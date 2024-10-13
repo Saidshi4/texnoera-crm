@@ -22,7 +22,8 @@ public class ApplicationConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> (org.springframework.security.core.userdetails.UserDetails) userRepository.findUserEntityByUsername(username)
+        return username -> (org.springframework.security.core.userdetails.UserDetails)
+                userRepository.findUserEntityByUsername(username)
                 .orElseThrow(() -> new  NotFoundException(
                 ExceptionEnum.USER_NOT_FOUND_BY_USERNAME.name(),
                 String.format(ExceptionEnum.USER_NOT_FOUND_BY_USERNAME.getLog(), username)));

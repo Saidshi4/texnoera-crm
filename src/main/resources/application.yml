@@ -8,17 +8,17 @@ spring:
     username: doadmin
     password: AVNS_QycABlcMxGk4MZ-wS1G
     hikari:
-      maximum-pool-size: 20  # Maksimum 20 bağlantı
-      connection-timeout: 30000  # Timeout 30 saniye (milisaniye cinsinden)
+      maximum-pool-size: 20
+      connection-timeout: 30000
 
   jpa:
     hibernate:
-      ddl-auto: update  # Liquibase kullanıyorsanız, Hibernate'in şema yönetimi yapmasını istemezsiniz.
+      ddl-auto: none
     show-sql: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
   liquibase:
-    enabled: false
-    change-log: classpath:db/changelog/db.changelog-master.xml  # Liquibase için ana değişiklik dosyası
+    change-log: liquibase/change-log-master.yaml
+

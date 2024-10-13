@@ -4,7 +4,6 @@ import com.example.texnoeracrm.enums.ExceptionEnum;
 import com.example.texnoeracrm.exception.InvalidTokenException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import java.util.List;

@@ -54,6 +54,13 @@ public class ErrorHandler {
         return new ExceptionGetDto(e.getMessage());
     }
 
+    @ExceptionHandler(UserNotActiveException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ExceptionGetDto handle(UserNotActiveException e){
+        log.error(e.getLog());
+        return new ExceptionGetDto(e.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ExceptionGetDto handle(Exception e){
@@ -83,4 +90,6 @@ public class ErrorHandler {
 
         return errors;
     }
+
+
 }

@@ -1,0 +1,214 @@
+databaseChangeLog:
+  - changeSet:
+      id: 3
+      author: said4shi
+      changes:
+        - createTable:
+            tableName: notifications
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: title
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: content
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_entity_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 4
+      author: said4shi
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: notifications
+            baseColumnNames: user_entity_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_notification_user
+
+  - changeSet:
+      id: 5
+      author: said4shi
+      changes:
+        - createTable:
+            tableName: device_tokens
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: token
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 6
+      author: said4shi
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: device_tokens
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_device_token_user
+
+  - changeSet:
+      id: 7
+      author: said4shi
+      changes:
+        - createTable:
+            tableName: groups
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: lesson
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 8
+      author: said4shi
+      changes:
+        - createTable:
+            tableName: group_days
+            columns:
+              - column:
+                  name: group_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: day_of_week
+                  type: varchar(20)  # Enum değerlerini saklamak için
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 9
+      author: said4shi
+      changes:
+        - createTable:
+            tableName: group_lesson_start_times
+            columns:
+              - column:
+                  name: group_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: day_of_week
+                  type: varchar(20)  # Enum değerlerini saklamak için
+                  constraints:
+                    nullable: false
+              - column:
+                  name: lesson_start_time
+                  type: time
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 10
+      author: said4shi
+      changes:
+        - createTable:
+            tableName: group_lesson_end_times
+            columns:
+              - column:
+                  name: group_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: day_of_week
+                  type: varchar(20)  # Enum değerlerini saklamak için
+                  constraints:
+                    nullable: false
+              - column:
+                  name: lesson_end_time
+                  type: time
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 11
+      author: said4shi
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: group_days
+            baseColumnNames: group_id
+            referencedTableName: groups
+            referencedColumnNames: id
+            constraintName: fk_group_days_group
+
+  - changeSet:
+      id: 12
+      author: said4shi
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: group_lesson_start_times
+            baseColumnNames: group_id
+            referencedTableName: groups
+            referencedColumnNames: id
+            constraintName: fk_group_lesson_start_times_group
+
+  - changeSet:
+      id: 13
+      author: said4shi
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: group_lesson_end_times
+            baseColumnNames: group_id
+            referencedTableName: groups
+            referencedColumnNames: id
+            constraintName: fk_group_lesson_end_times_group

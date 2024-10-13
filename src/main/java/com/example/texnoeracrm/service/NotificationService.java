@@ -13,6 +13,10 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
@@ -45,13 +49,18 @@ public class NotificationService {
         return userEntity;
     }
 
-    public List<NotificationGetDto> findALlByUserId(Long userId) {
-        log.info("ActionLog.findALlByUserId.start userId {}", userId);
-        List<NotificationEntity> notificationEntities = notificationRepository.findByUserId(userId);
-        List<NotificationGetDto> notificationGetDtos = notificationMapper.mapToDtos(notificationEntities);
-        log.info("ActionLog.findALlByUserId.end userId {}", userId);
-        return notificationGetDtos;
+    public Page<NotificationGetDto> findAllByUserId(Long userId, int page, int size) {
+        log.info("ActionLog.findAllByUserId.start userId {}", userId);
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<NotificationEntity> notificationPage = notificationRepository.findByUserEntityId(userId, pageable);
+
+        List<NotificationGetDto> notificationGetDtos = notificationMapper.mapToDtos(notificationPage.getContent());
+
+        log.info("ActionLog.findAllByUserId.end userId {}", userId);
+        return new PageImpl<>(notificationGetDtos, notificationPage.getPageable(), notificationPage.getTotalElements());
     }
+
 
     @Transactional
     public void checkLessonStartTime() {

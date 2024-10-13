@@ -9,6 +9,7 @@ public enum ExceptionEnum {
     USER_NOT_FOUND("ActionLog.findById.error user %d not found"),
     USER_NOT_FOUND_BY_USERNAME("ActionLog.findByUsername.error user %s not found"),
     USER_NOT_FOUND_BY_EMAIL("ActionLog.findByEmail.error by email %s"),
+    USER_NOT_ACTIVE("ActionLog.findById.error user %s not active"),
     EMAIL_ALREADY_EXISTS("ActionLog.findByEmail.error email %s already exists"),
     GROUP_NOT_FOUND("ActionLog.findById.error teacher %d not found"),
     TASK_NOT_FOUND("ActionLog.findById.error task %d not found"),

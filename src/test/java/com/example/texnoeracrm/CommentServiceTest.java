@@ -100,29 +100,5 @@ class CommentServiceTest {
         verify(userTaskRepository, times(1)).findById(taskId);
     }
 
-//    @Test
-//    void testWriteComment() {
-//        Long userId = 1L;
-//        CommentSetDto commentSetDto = new CommentSetDto();
-//        commentSetDto.setUserTaskId(1L);
-//        commentSetDto.setText("Test comment");
-//
-//        UserEntity userEntity = new UserEntity();
-//        UserTaskEntity userTaskEntity = new UserTaskEntity();
-//        CommentEntity commentEntity = new CommentEntity();
-//        List<CommentEntity> commentEntities = List.of(commentEntity);
-//        List<CommentGetDto> commentDtos = List.of(new CommentGetDto());
-//
-//        when(userTaskRepository.findById(commentSetDto.getUserTaskId())).thenReturn(Optional.of(userTaskEntity));
-//        when(userRepository.findById(userId)).thenReturn(Optional.of(userEntity));
-//        when(commentMapper.mapToDtos(commentEntities)).thenReturn(commentDtos);
-//
-//        List<CommentGetDto> result = commentService.writeComment(userId, commentSetDto);
-//
-//        assertEquals(commentDtos, result);
-//        verify(commentRepository, times(1)).save(any(CommentEntity.class));
-//        verify(userTaskRepository, times(2)).findById(commentSetDto.getUserTaskId());
-//        verify(userRepository, times(1)).findById(userId);
-//    }
 
 }

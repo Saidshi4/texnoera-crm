@@ -22,4 +22,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Long>, JpaSpec
 
     @Query(value = "select u from UserEntity as u join users_groups as ug on u.id = ug.userEntity.id where ug.groupEntity.id = :groupId")
     List<UserEntity> findByGroupId(Long groupId);
+
+    @Query("select dt.userEntity from device_tokens dt where dt.token = :deviceToken")
+    Optional<UserEntity> findByDeviceToken(String deviceToken);
 }

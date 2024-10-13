@@ -7,7 +7,9 @@ import com.example.texnoeracrm.service.AttendanceService;
 import com.example.texnoeracrm.service.auth.JwtService;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,15 +19,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/attendances")
 @RequiredArgsConstructor
+@Slf4j
 public class AttendanceController {
 
     private final AttendanceService attendanceService;
     private final JwtService jwtService;
-
-    @PostMapping("/groups")
-    public void creatAttendances(){
-        attendanceService.createAttendances();
-    }
 
     @GetMapping("/groups/{groupId}")
     public List<LocalDate> getAttendance(@PathVariable Long groupId){
@@ -34,9 +32,10 @@ public class AttendanceController {
 
     @PatchMapping("/groups/{groupId}")
     public void enterAttendance(@PathVariable Long groupId,
-                                @RequestParam("expectedDate") @DateTimeFormat(pattern = "yyyy-M-d") LocalDate expectedDate,
-                                @RequestBody List<AttendanceSetDto> attendanceSetDtos){
-        attendanceService.enterAttendances(groupId, expectedDate, attendanceSetDtos);
+                                @Valid @RequestBody List<AttendanceSetDto> attendanceSetDtos){
+        log.info("Received JSON: {}", attendanceSetDtos);
+
+        attendanceService.enterAttendances(groupId, attendanceSetDtos);
     }
 
     @GetMapping("/groups/{groupId}/by-date")

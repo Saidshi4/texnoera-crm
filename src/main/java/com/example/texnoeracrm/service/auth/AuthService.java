@@ -3,11 +3,13 @@ package com.example.texnoeracrm.service.auth;
 import com.example.texnoeracrm.dao.entity.DeviceTokenEntity;
 import com.example.texnoeracrm.dao.entity.RoleEntity;
 import com.example.texnoeracrm.dao.entity.UserEntity;
+import com.example.texnoeracrm.dao.repository.DeviceTokenRepository;
 import com.example.texnoeracrm.dao.repository.RoleRepository;
 import com.example.texnoeracrm.dao.repository.UserRepository;
 import com.example.texnoeracrm.enums.ExceptionEnum;
 import com.example.texnoeracrm.exception.AlreadyExistException;
 import com.example.texnoeracrm.exception.NotFoundException;
+import com.example.texnoeracrm.exception.UserNotActiveException;
 import com.example.texnoeracrm.exception.UserNotAuthorizedException;
 import com.example.texnoeracrm.mapper.UserMapper;
 import com.example.texnoeracrm.model.auth.AuthRequestDto;
@@ -37,6 +39,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final RoleRepository roleRepository;
+    private final DeviceTokenRepository deviceTokenRepository;
 
     public UserGetDto registerUser(UserSetDto userSetDto) {
         log.info("ActionLog.registerUser.start");
@@ -122,6 +125,10 @@ public class AuthService {
     public AuthenticationDto authenticate(AuthRequestDto authRequestDto) {
         log.info("ActionLog.authenticate.start for user: {}", authRequestDto.getUsername());
         UserEntity userEntity = findUserByUsername(authRequestDto.getUsername());
+        if (!userEntity.getIsActive()){
+            throw new UserNotActiveException(ExceptionEnum.USER_NOT_ACTIVE.name(),
+                    String.format(ExceptionEnum.USER_NOT_ACTIVE.getLog(), authRequestDto.getUsername()));
+        }
         verifyPassword(authRequestDto.getPassword(), userEntity.getPassword());
         authenticateUser(authRequestDto.getUsername(), authRequestDto.getPassword());
         registerDeviceToken(authRequestDto.getDeviceToken(), userEntity);
@@ -131,25 +138,31 @@ public class AuthService {
 
     private void registerDeviceToken(String deviceToken, UserEntity userEntity) {
         log.info("ActionLog.registerDeviceToken.start");
-        if (userEntity.getDeviceTokenEntities() == null) {
-            userEntity.setDeviceTokenEntities(new ArrayList<>());
-        }
-        boolean tokenExists = userEntity.getDeviceTokenEntities().stream()
-                .anyMatch(tokenEntity -> deviceToken.equals(tokenEntity.getToken()));
-        if (!tokenExists) {
-            DeviceTokenEntity deviceTokenEntity = DeviceTokenEntity.builder()
-                    .token(deviceToken)
-                    .userEntity(userEntity)
-                    .createdAt(LocalDateTime.now())
-                    .build();
-            userEntity.getDeviceTokenEntities().add(deviceTokenEntity);
-            userRepository.save(userEntity);
-            log.info("ActionLog.registerDeviceToken.success");
+
+        UserEntity userByDevice = userRepository.findByDeviceToken(deviceToken).orElse(null);
+        DeviceTokenEntity deviceTokenEntity = deviceTokenRepository.findByToken(deviceToken);
+
+        if (userByDevice != null) {
+            if (userByDevice.equals(userEntity)) {
+                log.info("ActionLog.registerDeviceToken.end user already registered");
+            } else {
+                if (deviceTokenEntity != null) {
+                    userByDevice.getDeviceTokenEntities().remove(deviceTokenEntity);
+                    userRepository.save(userByDevice);
+                }
+                userEntity.getDeviceTokenEntities().add(deviceTokenEntity);
+                userRepository.save(userEntity);
+            }
         } else {
-            log.info("ActionLog.registerDeviceToken.tokenAlreadyExists");
+            if (deviceTokenEntity != null) {
+                userEntity.getDeviceTokenEntities().add(deviceTokenEntity);
+                userRepository.save(userEntity);
+            }
         }
+
         log.info("ActionLog.registerDeviceToken.end");
     }
+
 
 
     private UserEntity findUserByUsername(String username) {

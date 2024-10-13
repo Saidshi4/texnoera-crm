@@ -4,8 +4,9 @@ import com.example.texnoeracrm.dao.entity.GroupEntity;
 import com.example.texnoeracrm.dao.entity.RoleEntity;
 import com.example.texnoeracrm.dao.entity.UserEntity;
 import com.example.texnoeracrm.dao.entity.UserGroupEntity;
+import com.example.texnoeracrm.dao.repository.RoleRepository;
 import com.example.texnoeracrm.enums.GenderEnum;
-import com.example.texnoeracrm.enums.RoleEnum;
+import com.example.texnoeracrm.model.set.UserSpecSetDto;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.jpa.domain.Specification;
@@ -124,6 +125,43 @@ public interface UserSpec {
             return criteriaBuilder.equal(groupJoin.get("id"), groupId);
         };
     }
+
+
+    static Specification<UserEntity> fromUserSpecSetDto(UserSpecSetDto userSpecSetDto, RoleEntity roleEntity) {
+        Specification<UserEntity> spec = Specification.where(hasName(userSpecSetDto.getName()))
+                .and(hasSurname(userSpecSetDto.getSurname()))
+                .and(hasFatherName(userSpecSetDto.getFatherName()))
+                .and(hasIdCardNo(userSpecSetDto.getIdCardNo()))
+                .and(hasPersonalNo(userSpecSetDto.getPersonalNo()))
+                .and(hasBirthdate(userSpecSetDto.getFromBirthdate(), userSpecSetDto.getToBirthdate()))
+                .and(hasGender(userSpecSetDto.getGender()))
+                .and(hasPhoneNumber(userSpecSetDto.getPhoneNumber()))
+                .and(hasEmail(userSpecSetDto.getEmail()))
+                .and(hasUsername(userSpecSetDto.getUsername()))
+                .and(isActive(userSpecSetDto.getIsActive()))
+                .and(belongsToGroup(userSpecSetDto.getGroupId()));
+
+        if (userSpecSetDto.getFromCreatedAt() != null && userSpecSetDto.getToCreatedAt() != null) {
+            spec = spec.and(hasCreatedAt(
+                    userSpecSetDto.getFromCreatedAt().atTime(0, 0, 0),
+                    userSpecSetDto.getToCreatedAt().atTime(23, 59, 59, 999999)));
+        } else if (userSpecSetDto.getFromCreatedAt() != null) {
+            spec = spec.and(hasCreatedAt(
+                    userSpecSetDto.getFromCreatedAt().atTime(0, 0, 0),
+                    null));
+        } else if (userSpecSetDto.getToCreatedAt() != null) {
+            spec = spec.and(hasCreatedAt(
+                    null,
+                    userSpecSetDto.getToCreatedAt().atTime(23, 59, 59, 999999)));
+        }
+
+        if (userSpecSetDto.getRole() != null) {
+            spec = spec.and(hasRole(roleEntity));
+        }
+        return spec;
+    }
+
+
 
 
 

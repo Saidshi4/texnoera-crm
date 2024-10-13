@@ -1,0 +1,113 @@
+databaseChangeLog:
+  - changeSet:
+      id: 14
+      author: said4shi
+      changes:
+        - createTable:
+            tableName: users_groups
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: group_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: diploma_no
+                  type: bigint
+                  constraints:
+                    nullable: true
+              - column:
+                  name: average_score
+                  type: decimal(5,2)
+                  constraints:
+                    nullable: true
+
+  - changeSet:
+      id: 15
+      author: said4shi
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: users_groups
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_users_groups_user
+
+  - changeSet:
+      id: 16
+      author: said4shi
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: users_groups
+            baseColumnNames: group_id
+            referencedTableName: groups
+            referencedColumnNames: id
+            constraintName: fk_users_groups_group
+
+  - changeSet:
+      id: 17
+      author: said4shi
+      changes:
+        - createTable:
+            tableName: tasks
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: text
+                  constraints:
+                    nullable: true
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deadline_day
+                  type: date
+                  constraints:
+                    nullable: true
+              - column:
+                  name: deadline_time
+                  type: time
+                  constraints:
+                    nullable: true
+              - column:
+                  name: group_id
+                  type: bigint
+                  constraints:
+                    nullable: true
+
+  - changeSet:
+      id: 18
+      author: said4shi
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: tasks
+            baseColumnNames: group_id
+            referencedTableName: groups
+            referencedColumnNames: id
+            constraintName: fk_tasks_group

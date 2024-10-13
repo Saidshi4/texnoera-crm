@@ -8,6 +8,7 @@ import com.example.texnoeracrm.service.UserTaskService;
 import com.example.texnoeracrm.service.auth.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,19 +42,13 @@ public class UserTaskController {
         return userTaskService.updateTask(userId, taskId, userTaskSetDto);
     }
 
-    //byTeacher
     @GetMapping("groups/{groupId}/tasks/{taskId}")
     public List<UserTaskGetByTeacherDto> getByTeacher(@PathVariable Long groupId, @PathVariable Long taskId){
         return userTaskService.getUserTaskByTeacher(groupId, taskId);
     }
 
-    @GetMapping("/demo")
-    public void getDemo(HttpServletRequest request){
-        userTaskService.checkDeadline();
-    }
-
     @PatchMapping("/{taskId}/grade")
-    public Integer gradeTask(HttpServletRequest request, @PathVariable Long taskId, @RequestBody TaskGradeSetDto gradeSetDto){
+    public Integer gradeTask(HttpServletRequest request, @PathVariable Long taskId, @Validated @RequestBody TaskGradeSetDto gradeSetDto){
         String token = (String) request.getAttribute("token");
         Long userId = jwtService.extractUserIdFromAccessToken(token, true);
         return userTaskService.gradeTask(userId, taskId, gradeSetDto);
